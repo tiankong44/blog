@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiankong44.dao.MessageMapper">
+
+    <select id="getAllMessage" resultType="com.tiankong44.model.Message">
+        select * from myblog.message  order by  createTime
+     </select>
+    <select id="getALLReply" resultType="com.tiankong44.model.Message">
+        select * from myblog.message_reply  order by  createTime
+     </select>
+    <select id="getReplyByMessageId" resultType="com.tiankong44.model.Message">
+        select * from myblog.message_reply where parent_comment_id=#{id} order by  createTime
+     </select>
+    <select id="getByParentMessageId" resultType="com.tiankong44.model.Message">
+        select * from myblog.message where parent_comment_id = #{parentCommentId}
+    </select>
+    <select id="getById" resultType="com.tiankong44.model.Message">
+        select * from myblog.message where id = #{id}
+    </select>
+    <insert id="saveMessage" parameterType="com.tiankong44.model.Message">
+        insert into myblog.message (nickname,email,content,avatar,createTime,published,admin)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{published},#{admin});
+    </insert>
+    <insert id="saveReply" parameterType="com.tiankong44.model.Message">
+        insert into myblog.message_reply (nickname,email,content,avatar,createTime,parent_comment_id,published,admin)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{parentCommentId},#{published},#{admin});
+    </insert>
+
+</mapper>

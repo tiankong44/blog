@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiankong44.dao.CommentMapper">
+
+    <select id="getCommentByBlogId" resultType="com.tiankong44.model.Comment">
+        select * from myblog.comment where blog_id=#{blogId} order by  createTime
+     </select>
+    <!--    <resultMap id="replyMap" type="com.tiankong44.model.Comment">-->
+    <!--        <id property="id" column="id"></id>-->
+    <!--        <result property="nickname" column="nickname"></result>-->
+    <!--        <result property="content" column="content"></result>-->
+    <!--        <result property="createTime" column="createTime"></result>-->
+    <!--        <result property="blogId" column="blogId"></result>-->
+    <!--        <result property="parentCommentId" column="parentCommentId"></result>-->
+    <!--        <result property="published" column="published"></result>-->
+    <!--        <result property="email" column="email"></result>-->
+    <!--    </resultMap>-->
+    <select id="getAllComment" resultType="com.tiankong44.model.Comment">
+      select * from myblog.comment  order by  createTime desc
+     </select>
+    <select id="getALLReply" resultType="com.tiankong44.model.Comment">
+        select * from myblog.comment_reply  order by  createTime desc
+     </select>
+    <select id="getReplyByCommentId" resultType="com.tiankong44.model.Comment">
+        select * from myblog.comment_reply where parent_comment_id=#{id} order by  createTime
+     </select>
+    <select id="getByParentCommentId" resultType="com.tiankong44.model.Comment">
+        select * from myblog.comment where parent_comment_id = #{parentCommentId}
+    </select>
+    <select id="getById" resultType="com.tiankong44.model.Comment">
+        select * from myblog.comment where id = #{id}
+    </select>
+    <select id="getFiveNewComment" resultType="com.tiankong44.model.Comment">
+        select DISTINCT blog_id from  myblog.comment where parent_comment_id IS null order  by createTime DESC  limit 5
+    </select>
+    <insert id="saveComment" parameterType="com.tiankong44.model.Comment">
+        insert into myblog.comment (nickname,email,content,avatar,createTime,blog_id,published,admin)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{published},#{admin});
+    </insert>
+    <insert id="saveReply" parameterType="com.tiankong44.model.Comment">
+        insert into myblog.comment_reply (nickname,email,content,avatar,createTime,blog_id,parent_comment_id,published,admin)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{parentCommentId},#{published},#{admin});
+    </insert>
+
+</mapper>

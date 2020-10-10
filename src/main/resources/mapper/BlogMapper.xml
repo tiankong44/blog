@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiankong44.dao.BlogMapper">
+
+    <!--    <resultMap id="FirstPageBlog" type="com.tiankong44.vo.FirstPageBlog">-->
+    <!--        <id column="id" property="id"/>-->
+    <!--        <result column="title" property="title"/>-->
+    <!--        <result column="firstPicture" property="firstPicture"/>-->
+    <!--        <result column="description" property="description"/>-->
+    <!--        <result column="user_id" property="user_id"/>-->
+    <!--        <result column="updateTime" property="updateTime"/>-->
+    <!--        <result column="tag_ids" property="tag_ids"/>-->
+    <!--        <result column="top" property="top"/>-->
+    <!--        <result column="views" property="views"/>-->
+    <!--    </resultMap>-->
+    <select id="getUser" resultType="com.tiankong44.model.User">
+          select  id,nickname,avatar from myblog.user where id=#{user_id}
+       </select>
+    <select id="getFirstPageBlog" resultType="com.tiankong44.model.Blog">
+           select id,title,firstPicture,description,user_id,updateTime,tag_ids,top,views from myblog.blog Order by updateTime desc
+    </select>
+    <select id="getFirstPageSearch" resultType="com.tiankong44.model.Blog">
+           select id,title,firstPicture,description,user_id,updateTime,tag_ids,top,views from myblog.blog where title like "%"#{name}"%" Order by updateTime desc
+    </select>
+
+    <select id="getArchivingBlog" resultType="com.tiankong44.model.Blog">
+           select id,title,description,createTime,views from myblog.blog Order by updateTime desc
+    </select>
+
+
+    <select id="getAllBlog" resultType="com.tiankong44.model.Blog">
+          select * from myblog.blog Order by updateTime desc
+       </select>
+
+
+    <select id="getUserIdByBlogId" resultType="long">
+          select user_id from myblog.blog where id= #{id}
+       </select>
+    <select id="getBlogByUserId" resultType="com.tiankong44.model.Blog">
+          select * from myblog.blog where user_id=#{user_id}  Order by updateTime desc
+       </select>
+
+
+    <select id="getBlogById" resultType="com.tiankong44.model.Blog">
+          select * from myblog.blog where id=#{id}
+       </select>
+    <select id="getMaxBlogId" resultType="java.lang.Long">
+          select MAX(id) from myblog.blog
+       </select>
+    <select id="getTopFiveViewBlog" resultType="com.tiankong44.model.Blog">
+        select id,title,views  from myblog.blog  ORDER BY views DESC LIMIT 5
+       </select>
+    <select id="getFiveNewBlog" resultType="com.tiankong44.model.Blog">
+          select id,title from myblog.blog  ORDER BY createTime DESC LIMIT 5
+       </select>
+    <select id="getBlogIdByTagId" resultType="long">
+          select blog_id from myblog.blog_tag where tag_id in (#{tag_id})
+       </select>
+    <select id="getByCondition" resultType="com.tiankong44.model.Blog">
+        select * from myblog.blog
+        <where>
+            <if test="title != null">
+                AND title like "%"#{title}"%"
+            </if>
+            <if test="recommend != null">
+                AND recommend=#{recommend}
+            </if>
+            <if test="ids != null">
+                AND id in
+                <foreach collection="ids" open="(" separator="," close=")" item="id" >
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+        <select id="getFiveNewCommentBlog" resultType="com.tiankong44.model.Blog">
+              select id,title from myblog.blog  ORDER BY createTime DESC LIMIT 7
+           </select>
+    <insert id="saveBlog" parameterType="com.tiankong44.model.Blog">
+         insert into blog(title,content,description,firstPicture,published,appreciation,commentabled,recommend,createTime,updateTime,user_id,tag_ids) values(#{title},#{content},#{description},#{firstPicture},#{published},#{appreciation},#{commentabled},#{recommend},#{createTime},#{updateTime},#{user_id},#{tag_ids});
+       </insert>
+    <delete id="deleteBlog">
+              delete from myblog.blog where id = #{id}
+          </delete>
+    <update id="updateBlog" parameterType="com.tiankong44.model.Blog">
+          update blog set title = #{title},content = #{content},description = #{description} ,firstPicture = #{firstPicture},published = #{published},appreciation = #{appreciation},
+          commentabled = #{commentabled},recommend = #{recommend} ,updateTime = #{updateTime}   ,tag_ids = #{tag_ids}      where id = #{id};
+      </update>
+
+    <update id="updateBlogViews" parameterType="com.tiankong44.model.Blog">
+          update blog set views= views+1    where id = #{id};
+      </update>
+    <update id="updateBlogPraise" parameterType="com.tiankong44.model.Blog">
+          update blog set praise= praise+1    where id = #{id};
+      </update>
+
+</mapper>

@@ -1,0 +1,673 @@
+
+/*边界线*/
+.my-border {
+    border: 1px solid #ced0d2
+}
+
+/*文本*/
+.my-text-nav {
+    font-size: 30px;
+}
+
+.my-text {
+    font-size: 18px;
+}
+
+.my-text-introduction {
+    font-size: 20px;
+    opacity: 0.7
+}
+
+.blog-title {
+    font-size: 20px;
+    opacity: 0.9
+}
+
+.blogpage-title {
+    text-align: center;
+    font-size: 24px;
+    text-shadow: 3px 2px 4px #000000;
+}
+
+.blogpage-content {
+
+    opacity: 0.9;
+   padding: 10px 30px 5px 30px;
+
+}
+
+.blogpage-content h6 {
+    font-size: .63em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content h5 {
+    font-size: .83em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content h4 {
+    font-size: 1em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content h3 {
+    font-size: 1.17em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content h1 {
+    font-size: 2em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.blogpage-content ol li {
+       display: list-item;
+        list-style-type:decimal;
+
+      /*  list-style-position:inside;*/
+
+       font-size: 16px;
+   }
+.blogpage-content ul li {
+       display: list-item;
+        list-style-type: disc;
+       /* list-style-position:inside;*/
+       font-size: 16px;
+
+   }
+.blogpage-content ul li  ol li{
+       display: list-item;
+   list-style-type:decimal;
+        list-style-position:inside;
+       font-size: 16px;
+   }
+
+.blogpage-content ol li  ul li{
+          display: list-item;
+          list-style-type: disc;
+       /* list-style: disc;*/
+          list-style-position:inside;
+          font-size: 16px;
+      }
+.blogpage-content ol li  ol li{
+                display: list-item;
+                list-style-type: disc;
+             /* list-style: disc;*/
+                list-style-position:inside;
+                font-size: 16px;
+            }
+.blogpage-content ul li  ul li{
+                            display: list-item;
+                            list-style-type: disc;
+                         /* list-style: disc;*/
+                            list-style-position:inside;
+                            font-size: 16px;
+                        }
+.blogpage-content p {
+    font-size: 16px;
+
+}
+
+.precontent-opacity {
+    font-size: 16px;
+    opacity: 0.7
+}
+
+.opacity-min {
+    font-size: 16px;
+    opacity: 0.7
+}
+
+.opacity-min-mintext {
+    font-size: 15px !important;
+    opacity: 0.5
+}
+
+.opacity-full {
+    font-size: 16px;
+    opacity: 1
+}
+
+/* ===========
+	工具样式
+	
+   =========== */
+
+/*置右*/
+/*头像*/
+.pic-head {
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    height: 30px;
+}
+
+.pic-index {
+    padding: 0 0 15px 30px;
+    width: 200px;
+    height: 150px;
+}
+
+.pic-title {
+    padding: 10px 10px 10px 100px;
+    width: 650px;
+    height: 400px;
+}
+
+.albums {
+
+}
+
+.gallery {
+    width: 90px;
+    height: 70px;
+}
+
+.layer-photos-demo img {
+    width: 260px;
+    height: 200px;
+    padding: 0 10px 10px 10px;
+}
+
+.pull-right {
+    float: right !important;
+}
+
+/* 置左*/
+.pull-left {
+    float: left !important;
+}
+
+/* ==============
+	自定义页面样式
+   ============== */
+html, body {
+    height: 100%;
+}
+
+body {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    background: url("../images/email-pattern.png")
+}
+
+/* 网站头部 */
+
+/* start header */
+.lay-blog .header {
+    position: relative;
+}
+
+.lay-blog .blog-seach {
+    padding: 18px 0px 17px 0px;
+}
+
+.lay-blog .blog-sewrap {
+    margin-bottom: 0px;
+}
+
+.lay-blog .blog-sebox {
+    position: relative;
+    margin-left: 0;
+    min-height: auto;
+}
+
+.lay-blog .blog-seach i {
+    position: absolute;
+    color: #fff;
+    width: 25px;
+    height: 27px;
+    line-height: 27px;
+    top: 9px;
+    left: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.lay-blog .blog-seach input {
+    padding-left: 50px;
+    width: 367px;
+    height: 45px;
+    line-height: 45px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, .15);
+    font-size: 16px;
+    color: #fff;
+}
+
+.lay-blog .blog-seach input.layui-input:hover {
+    border-color: rgba(255, 255, 255, .5) !important;
+}
+
+.lay-blog .blog-nav ul {
+    background: transparent;
+    padding-left: 0px;
+    padding-right: 20px;
+}
+
+.lay-blog .blog-nav ul li {
+    line-height: 100px;
+}
+
+.lay-blog .blog-nav ul li a {
+    font-size: 16px;
+    padding: 0 34px;
+}
+
+.lay-blog .blog-nav ul li.layui-this:after, .lay-blog .layui-nav-bar {
+    background: #C1E4FF;
+}
+
+.lay-blog .blog-nav .personal {
+    height: 100px;
+}
+
+.lay-blog .blog-nav .personal i {
+    color: #FFF;
+    font-size: 20px;
+}
+
+.lay-blog .blog-nav .personal:hover {
+    color: #FFF;
+}
+
+.lay-blog .mobile-nav {
+    display: none;
+    padding: 0 20px;
+}
+
+.lay-blog .mobile-nav i {
+    font-size: 40px;
+    color: #fff;
+}
+
+.lay-blog ul.pop-nav {
+    width: 100%;
+    line-height: 60px;
+    position: absolute;
+    left: 0px;
+    top: 100px;
+    text-align: center;
+    background: #1e9fff;
+    display: none;
+    z-index: 2;
+}
+
+.lay-blog ul.pop-nav li {
+    border-top: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.lay-blog ul.pop-nav li a {
+    display: block;
+    height: 100%;
+    width: 100%;
+    font-size: 20px;
+    color: #fff;
+}
+
+@media only screen and (max-width: 1100px) {
+    .lay-blog .blog-seach {
+        /*padding-left:  50px;*/
+
+    }
+
+    .lay-blog .blog-seach input {
+        width: 200px;
+    }
+
+}
+
+@media only screen and (max-width: 900px) {
+    .lay-blog .blog-seach {
+        /*display:true;*/
+    }
+
+
+}
+
+.blog-img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.first-pic {
+    display: block;
+    max-width: 80%;
+    height: auto \9;
+
+}
+
+/*图片*/
+
+.replyText {
+    display: block;
+    max-width: 80%;
+    height: auto \9;
+}
+
+
+@media only screen and (max-width: 750px) {
+    .blog-img {
+        width: 350px;
+    !important;
+        height: 200px;
+    !important;
+    }
+
+    .replyText {
+        height: 150px;
+        width: 200px;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    .lay-blog .blog-nav {
+        display: none;
+    }
+
+    .lay-blog .mobile-nav {
+        display: block;
+    }
+
+    .lay-blog .header-wrap {
+        /*padding: 0 20px 0 40px;*/
+    }
+
+    .lay-blog ul#pop-nav {
+        display: none;
+    }
+
+    .blog-img {
+        width: 350px;!important;
+        height: 200px;!important;
+    }
+
+    .replyText {
+        height: 150px;
+        width: 200px;
+    }
+}
+
+@media only screen and (min-width: 750px) {
+    .lay-blog ul#pop-nav {
+        display: none !important;
+    }
+
+    .replyText {
+        height: 150px;
+        width: 200px;
+    }
+}
+
+/* end header */
+
+/* 辅助 */
+.lay-blog .container .count .layblog-this {
+    color: #FF5722 !important;
+}
+
+/* start container */
+.lay-blog .container-wrap {
+    margin: 0px auto 0;
+    min-height: 100%;
+    padding: 120px 0 160px 0;
+    box-sizing: border-box;
+}
+
+.lay-blog .container {
+    width: 750px;
+    margin: 0 auto;
+}
+
+.lay-blog .container h4 {
+    margin-bottom: 15px;
+    line-height: 70px;
+    background: #fff;
+    font-size: 16px;
+}
+
+.lay-blog .container h4 p {
+    padding-left: 40px;
+    color: #666666;
+}
+
+.lay-blog .container h4 p i {
+    font-size: 26px;
+    padding-right: 10px;
+    position: relative;
+    top: 3px;
+}
+
+.lay-blog .container .item {
+    margin-bottom: 15px;
+    background: #fff;
+    padding-top: 20px;
+}
+
+.lay-blog .container .item .item-box {
+    padding: 0 35px 24px;
+    font-size: 14px;
+}
+
+.lay-blog .container .item h3 {
+    line-height: 36px;
+    font-size: 20px;
+}
+
+.lay-blog .container .item h5 {
+    line-height: 38px;
+    color: #a5a5a5;
+}
+
+.lay-blog .container .item p {
+    line-height: 30px;
+    padding-bottom: 10px;
+}
+
+.lay-blog .container .item .comment {
+    width: 100%;
+    line-height: 56px;
+    background: #f9f9f9;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.lay-blog .container .item .comment a {
+    display: inline-block;
+    width: 50%;
+    text-align: center;
+    float: left;
+}
+
+.lay-blog .container .item .comment a + a {
+    border-left: 1px solid #efefef;
+    margin-left: -1px;
+}
+
+.lay-blog .container .item-btn {
+    text-align: center;
+    margin-top: 20px;
+}
+
+@media only screen and (max-width: 750px) {
+    .lay-blog .container {
+        width: 100%;
+        margin: 0 auto 70px;
+    }
+
+    .lay-blog .container .contar-wrap {
+        padding: 0 10px 10px;
+    }
+
+    .lay-blog .container-wrap {
+        padding-top: 110px;
+    }
+}
+
+/* end container */
+
+/*    height: 60px;
+    margin-top: -60px;
+    background: maroon;
+*/
+
+/* start foooter */
+.lay-blog .footer {
+    width: 100%;
+    padding: 30px 0;
+    line-height: 30px;
+    background: #23262e;
+    color: #fff;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    text-align: center;
+    margin-top: -120px;
+}
+
+.lay-blog .footer span {
+    padding: 0 5px;
+}
+
+.lay-blog .footer a {
+    color: #fff;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* end foooter */
+
+/* start message*/
+.container-message textarea {
+    font-size: 14px;
+}
+
+.lay-blog .container-message .item-btn {
+    text-align: right;
+}
+
+.lay-blog .container-message .item-btn {
+    margin-bottom: 50px;
+}
+
+.lay-blog .container-message .info-item {
+    font-size: 14px;
+    margin-bottom: 66px;
+}
+
+.lay-blog .container-message .info-img {
+    cursor: pointer;
+    float: left;
+    padding-right: 20px;
+}
+
+.lay-blog .container-message .info-text {
+    padding-left: 88px;
+}
+
+.lay-blog .container-message .title {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.lay-blog .container-message .title .name {
+    float: left;
+    display: block;
+    line-height: 38px;
+    color: #787878;
+}
+
+.info-intr {
+    line-height: 24px;
+}
+
+.lay-blog .container-message .title .info-img {
+    float: right;
+    color: #4b5a75;
+}
+
+.lay-blog .container-message .title .info-img i {
+    font-size: 24px;
+    padding-right: 5px;
+    position: relative;
+    top: 4px;
+}
+
+.lay-blog .container-message .paging {
+    text-align: center;
+    padding-top: 30px;
+}
+
+/* end message*/
+
+/* start details */
+.lay-blog .container-details .item {
+    margin-bottom: 30px;
+}
+
+.lay-blog .container-details .comt {
+    padding: 0 20px;
+    font-size: 18px;
+    margin-bottom: 90px;
+}
+
+.lay-blog .container-details .count {
+    margin-top: 35px;
+    color: #999999;
+    cursor: pointer;
+}
+
+.lay-blog .container-details .count i {
+    margin-right: 5px;
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+}
+
+/* end details */
+
+/* start about */
+.container-about .item .item-box h3 {
+    margin-bottom: 10px;
+}
+
+.container-about .item .item-box p {
+    color: #6a6a6a;
+    margin-bottom: 20px;
+}
+
+/* end about */
+
+/*start comment*/
+.container-comment .btnbox {
+    text-align: right;
+    padding-top: 20px;
+}
+
+.container-comment .btnbox a {
+    display: inline-block;
+    height: 38px;
+    line-height: 38px;
+    padding: 0 18px;
+    background-color: #009688;
+    color: #fff;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+/*end comment*/

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiankong44.dao.GalleryMapper">
+
+    <insert id="saveImg" parameterType="com.tiankong44.model.Gallery">
+      insert into gallery(imgName,path,uploadDate,user_id) values(#{imgName},#{path},#{uploadDate},#{userId});
+    </insert>
+
+    <select id="listImg" resultType="com.tiankong44.model.Gallery">
+        select * from myblog.gallery where user_id=#{id} Order by   uploadDate DESC
+     </select>
+
+
+    <delete id="deleteImg">
+        delete from myblog.gallery where id = #{id}
+    </delete>
+    <select id="findImgByDate" resultType="com.tiankong44.model.Gallery">
+        select * from myblog.gallery where Date(uploadDate) BETWEEN #{oldDate} and  #{newDate} And user_id=#{id}
+     </select>
+    <select id="findImgById" resultType="com.tiankong44.model.Gallery">
+        select imgName from myblog.gallery where id=#{id}
+     </select>
+</mapper>
