@@ -2,7 +2,6 @@ package com.tiankong44.service;
 
 import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.model.Tag;
-
 import java.util.List;
 
 public interface TagService {
@@ -20,7 +19,6 @@ public interface TagService {
 
     Tag getById(Long id);
 
-
     Tag getByName(String name);
 
     List<Tag> getSearch(String name);
@@ -32,6 +30,4 @@ public interface TagService {
     List<Tag> getAdminTag();
 
     List<Tag> getTagsByBlogId(Long tag_id);
-
-    BaseRes getBlogListByTagId(String msg);
 }

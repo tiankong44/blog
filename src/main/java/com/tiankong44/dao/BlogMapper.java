@@ -6,10 +6,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
 public interface BlogMapper {
+    Map getBlogByBlogId(Long id);
 
     Blog getBlogById(Long id);
 
@@ -17,7 +19,7 @@ public interface BlogMapper {
 
     List<Blog> getAllBlog();
 
-    List<Blog> getFirstPageBlog();
+    List<Map> getFirstPageBlog();
 
     Long getMaxBlogId();
 
@@ -47,9 +49,7 @@ public interface BlogMapper {
 
     List<Blog> getFirstPageSearch(String title);
 
-  //  List<Blog> getAllRecommendBlog();
-
     List<Blog> getByCondition(String title, List<Long> ids, boolean recommend);
 
-
+    List<Blog> getBlogListByTagId(Long tagId);
 }

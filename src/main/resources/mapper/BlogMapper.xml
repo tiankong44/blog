@@ -4,60 +4,142 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tiankong44.dao.BlogMapper">
 
-    <!--    <resultMap id="FirstPageBlog" type="com.tiankong44.vo.FirstPageBlog">-->
-    <!--        <id column="id" property="id"/>-->
-    <!--        <result column="title" property="title"/>-->
-    <!--        <result column="firstPicture" property="firstPicture"/>-->
-    <!--        <result column="description" property="description"/>-->
-    <!--        <result column="user_id" property="user_id"/>-->
-    <!--        <result column="updateTime" property="updateTime"/>-->
-    <!--        <result column="tag_ids" property="tag_ids"/>-->
-    <!--        <result column="top" property="top"/>-->
-    <!--        <result column="views" property="views"/>-->
-    <!--    </resultMap>-->
+    <resultMap id="Blog" type="com.tiankong44.model.Blog">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="firstPicture" property="firstPicture"/>
+        <result column="content" property="content"/>
+        <result column="views" property="views"/>
+        <result column="praise" property="praise"/>
+        <result column="appreciation" property="appreciation"/>
+        <result column="commentabled" property="commentabled"/>
+        <result column="published" property="published"/>
+        <result column="top" property="top"/>
+        <result column="recommend" property="recommend"/>
+        <result column="createTime" property="createTime"/>
+        <result column="updateTime" property="updateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="tag_ids" property="tagIds"/>
+        <result column="description" property="description"/>
+        <association property="user" javaType="com.tiankong44.model.User">
+            <id column="uid" property="id"/>
+            <result column="username" property="username"/>
+            <result column="email" property="email"/>
+            <result column="avatar" property="avatar"/>
+            <result column="nickname" property="nickname"/>
+        </association>
+        <collection property="tags" ofType="com.tiankong44.model.Tag">
+            <id column="tid" property="id"/>
+            <result column="name" property="name"/>
+        </collection>
+    </resultMap>
     <select id="getUser" resultType="com.tiankong44.model.User">
-          select  id,nickname,avatar from myblog.user where id=#{user_id}
-       </select>
-    <select id="getFirstPageBlog" resultType="com.tiankong44.model.Blog">
-           select id,title,firstPicture,description,user_id,updateTime,tag_ids,top,views from myblog.blog Order by updateTime desc
+        select id,nickname,avatar from myblog.user where id=#{user_id}
     </select>
-    <select id="getFirstPageSearch" resultType="com.tiankong44.model.Blog">
-           select id,title,firstPicture,description,user_id,updateTime,tag_ids,top,views from myblog.blog where title like "%"#{name}"%" Order by updateTime desc
+    <select id="getFirstPageBlog" resultMap="Blog">
+        SELECT b.id id,b.title title ,
+        b.firstPicture firstPicture,b.views views,
+        b.praise praise,b.appreciation appreciation,
+        b.commentabled commentabled,b.published published,
+        b.top top,b.recommend recommend,b.createTime createTime,
+        b.updateTime updateTime,left(b.description,200) description,
+        b.user_id userId,
+        u.nickname nickname,u.email email,u.avatar avatar,
+        u.id uid, u.username username,
+        t.id tid,t.name name
+        from myblog.blog b, myblog.user u ,tag t,blog_tag bt
+        WHERE b.user_id=u.id AND published=1 AND bt.blog_id=b.id AND bt.tag_id=t.id
     </select>
-
+    <select id="getFirstPageSearch" resultMap="Blog">
+        SELECT b.id id,b.title title ,
+        b.firstPicture firstPicture,b.views views,
+        b.praise praise,b.appreciation appreciation,
+        b.commentabled commentabled,b.published published,
+        b.top top,b.recommend recommend,b.createTime createTime,
+        b.updateTime updateTime,left(b.description,200) description,
+        b.user_id userId,
+        u.nickname nickname,u.email email,u.avatar avatar,
+        u.id uid, u.username username,
+        t.id tid,t.name name
+        from myblog.blog b, myblog.user u ,tag t,blog_tag bt
+        WHERE b.user_id=u.id AND published=1 AND bt.blog_id=b.id AND bt.tag_id=t.id and b.title like
+        "%"#{name}"%" Order by updateTime desc
+    </select>
+    <select id="getBlogListByTagId" resultMap="Blog">
+        SELECT b.id id,b.title title ,
+        b.firstPicture firstPicture,b.views views,
+        b.praise praise,b.appreciation appreciation,
+        b.commentabled commentabled,b.published published,
+        b.top top,b.recommend recommend,b.createTime createTime,
+        b.updateTime updateTime,left(b.description,200) description,
+        b.user_id userId,
+        u.nickname nickname,u.email email,u.avatar avatar,
+        u.id uid, u.username username,
+        t.id tid,t.name name
+        from myblog.blog b, myblog.user u ,tag t,blog_tag bt
+        WHERE b.user_id=u.id AND published=1 AND bt.blog_id=b.id AND bt.tag_id=t.id and t.id=#{tagId}
+    </select>
     <select id="getArchivingBlog" resultType="com.tiankong44.model.Blog">
-           select id,title,description,createTime,views from myblog.blog Order by updateTime desc
+        select id,title,description,createTime,views from myblog.blog Order by updateTime desc
     </select>
 
 
     <select id="getAllBlog" resultType="com.tiankong44.model.Blog">
-          select * from myblog.blog Order by updateTime desc
-       </select>
+        select * from myblog.blog Order by updateTime desc
+    </select>
 
 
     <select id="getUserIdByBlogId" resultType="long">
-          select user_id from myblog.blog where id= #{id}
-       </select>
-    <select id="getBlogByUserId" resultType="com.tiankong44.model.Blog">
-          select * from myblog.blog where user_id=#{user_id}  Order by updateTime desc
-       </select>
 
+        SELECT b.* from myblog.blog b, myblog.user u WHERE b.id=#{id} AND b.user_id=u.id
+    </select>
+    <select id="getBlogByUserId" resultType="com.tiankong44.model.Blog">
+        select * from myblog.blog where user_id=#{user_id} Order by updateTime desc
+    </select>
+
+
+    <select id="getBlogByBlogId" resultType="java.util.Map">
+        SELECT b.id id,b.title title ,b.content concent ,
+        b.firstPicture firstPicture,b.views views,
+        b.praise praise,b.appreciation appreciation,
+        b.commentabled commentabled,b.published published,
+        b.top top,b.recommend recommend,b.createTime createTime,
+        b.updateTime updateTime,b.description description,
+        b.user_id userId,u.nickname nickName,u.email email,u.avatar avatar
+        from myblog.blog b, myblog.user u where b.id=#{id} AND b.user_id=u.id AND published=1
+    </select>
+
+
+    <!--    <select id="getBlogByBlogId" resultMap="Blog">-->
+    <!--        SELECT b.id id,b.title title ,-->
+    <!--        b.firstPicture firstPicture,b.views views,-->
+    <!--        b.praise praise,b.appreciation appreciation,-->
+    <!--        b.commentabled commentabled,b.published published,-->
+    <!--        b.top top,b.recommend recommend,b.createTime createTime,-->
+    <!--        b.updateTime updateTime,left(b.description,200) description,-->
+    <!--        b.user_id userId,-->
+    <!--        u.nickname nickname,u.email email,u.avatar avatar,-->
+    <!--        u.id uid, u.username username,-->
+    <!--        t.id tid,t.name name-->
+    <!--        from myblog.blog b, myblog.user u ,tag t,blog_tag bt-->
+    <!--        WHERE b.user_id=u.id AND published=1 AND bt.blog_id=b.id AND bt.tag_id=t.id and b.id=#{id}-->
+    <!--    </select>-->
 
     <select id="getBlogById" resultType="com.tiankong44.model.Blog">
-          select * from myblog.blog where id=#{id}
-       </select>
+        select * from myblog.blog where id=#{id}
+    </select>
     <select id="getMaxBlogId" resultType="java.lang.Long">
-          select MAX(id) from myblog.blog
-       </select>
+        select MAX(id) from myblog.blog
+    </select>
     <select id="getTopFiveViewBlog" resultType="com.tiankong44.model.Blog">
-        select id,title,views  from myblog.blog  ORDER BY views DESC LIMIT 5
-       </select>
+        select id,title,views from myblog.blog ORDER BY views DESC LIMIT 5
+    </select>
     <select id="getFiveNewBlog" resultType="com.tiankong44.model.Blog">
-          select id,title from myblog.blog  ORDER BY createTime DESC LIMIT 5
-       </select>
+        select id,title from myblog.blog ORDER BY createTime DESC LIMIT 5
+    </select>
     <select id="getBlogIdByTagId" resultType="long">
-          select blog_id from myblog.blog_tag where tag_id in (#{tag_id})
-       </select>
+        select blog_id from myblog.blog_tag where tag_id in (#{tag_id})
+    </select>
     <select id="getByCondition" resultType="com.tiankong44.model.Blog">
         select * from myblog.blog
         <where>
@@ -69,31 +151,36 @@
             </if>
             <if test="ids != null">
                 AND id in
-                <foreach collection="ids" open="(" separator="," close=")" item="id" >
+                <foreach collection="ids" open="(" separator="," close=")" item="id">
                     #{id}
                 </foreach>
             </if>
         </where>
     </select>
-        <select id="getFiveNewCommentBlog" resultType="com.tiankong44.model.Blog">
-              select id,title from myblog.blog  ORDER BY createTime DESC LIMIT 7
-           </select>
+    <select id="getFiveNewCommentBlog" resultType="com.tiankong44.model.Blog">
+        select id,title from myblog.blog ORDER BY createTime DESC LIMIT 7
+    </select>
+
     <insert id="saveBlog" parameterType="com.tiankong44.model.Blog">
-         insert into blog(title,content,description,firstPicture,published,appreciation,commentabled,recommend,createTime,updateTime,user_id,tag_ids) values(#{title},#{content},#{description},#{firstPicture},#{published},#{appreciation},#{commentabled},#{recommend},#{createTime},#{updateTime},#{user_id},#{tag_ids});
-       </insert>
+        insert into
+        blog(title,content,description,firstPicture,published,appreciation,commentabled,recommend,createTime,updateTime,user_id,tag_ids)
+        values(#{title},#{content},#{description},#{firstPicture},#{published},#{appreciation},#{commentabled},#{recommend},#{createTime},#{updateTime},#{user_id},#{tag_ids});
+    </insert>
     <delete id="deleteBlog">
-              delete from myblog.blog where id = #{id}
-          </delete>
+        delete from myblog.blog where id = #{id}
+    </delete>
     <update id="updateBlog" parameterType="com.tiankong44.model.Blog">
-          update blog set title = #{title},content = #{content},description = #{description} ,firstPicture = #{firstPicture},published = #{published},appreciation = #{appreciation},
-          commentabled = #{commentabled},recommend = #{recommend} ,updateTime = #{updateTime}   ,tag_ids = #{tag_ids}      where id = #{id};
-      </update>
+        update blog set title = #{title},content = #{content},description = #{description} ,firstPicture =
+        #{firstPicture},published = #{published},appreciation = #{appreciation},
+        commentabled = #{commentabled},recommend = #{recommend} ,updateTime = #{updateTime} ,tag_ids = #{tag_ids} where
+        id = #{id};
+    </update>
 
     <update id="updateBlogViews" parameterType="com.tiankong44.model.Blog">
-          update blog set views= views+1    where id = #{id};
-      </update>
+        update blog set views= views+1 where id = #{id};
+    </update>
     <update id="updateBlogPraise" parameterType="com.tiankong44.model.Blog">
-          update blog set praise= praise+1    where id = #{id};
-      </update>
+        update blog set praise= praise+1 where id = #{id};
+    </update>
 
 </mapper>

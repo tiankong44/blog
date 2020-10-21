@@ -39,7 +39,7 @@ public class Blog  {
     private String updateTime;
 
     //获取用户id
-    private Long user_id;
+    private Long userId;
     //获取多个标签的id
     private String tag_ids;
     //描述
