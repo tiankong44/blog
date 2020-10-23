@@ -4,33 +4,24 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.dao.BlogMapper;
+import com.tiankong44.dao.CommentMapper;
 import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import com.tiankong44.model.Tag;
 import com.tiankong44.model.User;
 import com.tiankong44.service.BlogService;
 import com.tiankong44.service.CommentService;
-import com.tiankong44.util.CosineSimilarity;
-import com.tiankong44.util.JsonUtils;
-import com.tiankong44.util.MarkdownUtil;
-import com.tiankong44.util.RedisUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.tiankong44.util.*;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -42,6 +33,8 @@ public class BlogServiceImpl implements BlogService {
     private CommentService commentService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private CommentMapper commentMapper;
 
     public BlogServiceImpl() {
     }
@@ -78,7 +71,7 @@ public class BlogServiceImpl implements BlogService {
             }
 
             Map blog = this.blogMapper.getBlogByBlogId(id);
-            String content = (String) blog.get("concent");
+            String content = (String) blog.get("content");
             blog.put("content", MarkdownUtil.markdownToHtml(content));
             List<Tag> tagList = this.tagService.getTagsByBlogId(id);
             blog.put("tags", tagList);
@@ -180,8 +173,8 @@ public class BlogServiceImpl implements BlogService {
                 String showTags = " ";
 
                 Tag tag;
-                for (Iterator var24 = tagList.iterator(); var24.hasNext(); showTags = showTags + tag.getName()) {
-                    tag = (Tag) var24.next();
+                for (Iterator it = tagList.iterator(); it.hasNext(); showTags = showTags + tag.getName()) {
+                    tag = (Tag) it.next();
                 }
 
                 blog.setShowTags(showTags.trim());
@@ -265,10 +258,10 @@ public class BlogServiceImpl implements BlogService {
         Map<String, Object> blogMap = new HashMap();
         List<Comment> commentList = this.commentService.getFiveNewComment();
         List<Blog> blogList = new ArrayList();
-        Iterator var5 = commentList.iterator();
+        Iterator it = commentList.iterator();
 
-        while (var5.hasNext()) {
-            Comment comment = (Comment) var5.next();
+        while (it.hasNext()) {
+            Comment comment = (Comment) it.next();
             blogList.add(this.blogMapper.getBlogById(comment.getBlogId()));
         }
 
@@ -329,8 +322,8 @@ public class BlogServiceImpl implements BlogService {
 
             pageNum = reqJson.getInt("pageNum");
             pageSize = reqJson.getInt("pageSize");
-        } catch (Exception var8) {
-            var8.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             res.setCode(1);
             res.setDesc("请求参数异常");
             return res;
@@ -361,8 +354,8 @@ public class BlogServiceImpl implements BlogService {
 
             pageNum = reqJson.getInt("pageNum");
             pageSize = reqJson.getInt("pageSize");
-        } catch (Exception var9) {
-            var9.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             res.setCode(1);
             res.setDesc("请求参数异常");
             return res;
@@ -386,8 +379,62 @@ public class BlogServiceImpl implements BlogService {
         this.blogMapper.updateBlogViews(id);
     }
 
-    public void updateBlogPraise(Long id) {
-        this.blogMapper.updateBlogPraise(id);
+    @Override
+    @Transactional
+    public BaseRes updateBlogPraise(HttpServletRequest request, String msg) {
+        BaseRes res = new BaseRes();
+        JSONObject reqJson = null;
+
+        reqJson = JSONObject.fromObject(msg);
+        Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "id");
+        if (checkMap != null) {
+            res.setCode(1);
+            res.setDesc("请求参数错误");
+            return res;
+        }
+        Long id = reqJson.getLong("id");
+        String ip = request.getRemoteAddr() + id + "view";
+        if (redisUtil.hasKey(ip)) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("你已经点过赞了！");
+        } else {
+            blogMapper.updateBlogPraise(id);
+            redisUtil.setEx(ip, ip, 3L, TimeUnit.DAYS);
+            String praise = blogMapper.getPraiseByBlogId(id);
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setData(praise);
+            res.setDesc("点赞成功！");
+            return res;
+        }
+
+
+        return res;
+    }
+
+    @Override
+    public BaseRes getComment(String msg) {
+        BaseRes res = new BaseRes();
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "id");
+            if (checkMap != null) {
+                res.setCode(1);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+            Long id = reqJson.getLong("id");
+            List<Comment> comments = commentMapper.getCommentsByBlogId(id);
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setData(comments);
+            res.setDesc("评论列表获取成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(1);
+            res.setDesc("请求参数异常");
+            return res;
+        }
+        return res;
     }
 
     public List<Long> getBlogIdByTagId(Long tag_id) {
@@ -410,8 +457,8 @@ public class BlogServiceImpl implements BlogService {
 
             pageNum = reqJson.getInt("pageNum");
             pageSize = reqJson.getInt("pageSize");
-        } catch (Exception var10) {
-            var10.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             res.setCode(1);
             res.setDesc("请求参数异常");
             return res;

@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @NoArgsConstructor
@@ -19,11 +18,11 @@ public class Comment {
     private String email;
     //评论内容
     private String content;
-    private boolean admin;
+    private int admin;
     //头像
     private String avatar;
     //创建时间
-    private Date createTime;
+    private String createTime;
     //博客ID
     private Long blogId;
     //父评论Id
@@ -31,7 +30,7 @@ public class Comment {
     //父评论昵称
     private String parentNickname;
     //是否审核通过
-    private boolean published;
+    private int published;
     private Blog blog;
     //回复评论列表
     private List<Comment> replyComments = new ArrayList<>();

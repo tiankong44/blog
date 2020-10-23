@@ -5,27 +5,41 @@
 <mapper namespace="com.tiankong44.dao.CommentMapper">
 
     <select id="getCommentByBlogId" resultType="com.tiankong44.model.Comment">
-        select * from myblog.comment where blog_id=#{blogId} order by  createTime
-     </select>
-    <!--    <resultMap id="replyMap" type="com.tiankong44.model.Comment">-->
-    <!--        <id property="id" column="id"></id>-->
-    <!--        <result property="nickname" column="nickname"></result>-->
-    <!--        <result property="content" column="content"></result>-->
-    <!--        <result property="createTime" column="createTime"></result>-->
-    <!--        <result property="blogId" column="blogId"></result>-->
-    <!--        <result property="parentCommentId" column="parentCommentId"></result>-->
-    <!--        <result property="published" column="published"></result>-->
-    <!--        <result property="email" column="email"></result>-->
-    <!--    </resultMap>-->
+        select * from myblog.comment where blog_id=#{blogId} order by createTime
+    </select>
+    <resultMap id="Comment" type="com.tiankong44.model.Comment">
+        <id property="id" column="id"></id>
+        <result property="nickname" column="nickname"></result>
+        <result property="email" column="email"></result>
+        <result property="avatar" column="avatar"></result>
+        <result property="content" column="content"></result>
+        <result property="createTime" column="createTime"></result>
+        <result property="blogId" column="blog_id"></result>
+        <result property="parentCommentId" column="parent_comment_id"></result>
+        <result property="published" column="published"></result>
+        <result property="admin" column="admin"></result>
+        <collection property="replyComments" ofType="com.tiankong44.model.Comment">
+            <id property="id" column="cr_id"></id>
+            <result property="nickname" column="cr_nickname"></result>
+            <result property="email" column="cr_email"></result>
+            <result property="avatar" column="cr_avatar"></result>
+            <result property="content" column="cr_content"></result>
+            <result property="createTime" column="cr_createTime"></result>
+            <result property="blogId" column="cr_blog_id"></result>
+            <result property="parentCommentId" column="cr_parent_comment_id"></result>
+            <result property="published" column="cr_published" ></result>
+            <result property="admin" column="cr_admin"></result>
+        </collection>
+    </resultMap>
     <select id="getAllComment" resultType="com.tiankong44.model.Comment">
-      select * from myblog.comment  order by  createTime desc
-     </select>
+        select * from myblog.comment order by createTime desc
+    </select>
     <select id="getALLReply" resultType="com.tiankong44.model.Comment">
-        select * from myblog.comment_reply  order by  createTime desc
-     </select>
+        select * from myblog.comment_reply order by createTime desc
+    </select>
     <select id="getReplyByCommentId" resultType="com.tiankong44.model.Comment">
-        select * from myblog.comment_reply where parent_comment_id=#{id} order by  createTime
-     </select>
+        select * from myblog.comment_reply where parent_comment_id=#{id} order by createTime
+    </select>
     <select id="getByParentCommentId" resultType="com.tiankong44.model.Comment">
         select * from myblog.comment where parent_comment_id = #{parentCommentId}
     </select>
@@ -33,15 +47,30 @@
         select * from myblog.comment where id = #{id}
     </select>
     <select id="getFiveNewComment" resultType="com.tiankong44.model.Comment">
-        select DISTINCT blog_id from  myblog.comment where parent_comment_id IS null order  by createTime DESC  limit 5
+        select DISTINCT blog_id from myblog.comment where parent_comment_id IS null order by createTime DESC limit 5
     </select>
-    <insert id="saveComment" parameterType="com.tiankong44.model.Comment">
+
+    <select id="getCommentsByBlogId" resultMap="Comment">
+        SELECT c.id ,c.nickname,c.email,c.content,c.avatar,
+        date_format(c.createTime,'%Y-%m-%d %H:%i:%s') createTime,c.blog_id,
+        c.parent_comment_id,c.published,c.admin,
+        cr.id cr_id,cr.nickname cr_nickname,cr.email cr_email,
+        cr.content cr_content,cr.avatar cr_avatar,
+        date_format( cr.createTime,'%Y-%m-%d %H:%i:%s') cr_createTime,
+        cr.blog_id cr_blog_id,cr.parent_comment_id cr_parent_comment_id,cr.published cr_published,cr.admin cr_admin
+        FROM comment c left join comment_reply cr ON cr.parent_comment_id=c.id  AND cr.id IS NOT null
+
+        WHERE c.blog_id=#{blogId}
+    </select>
+    <insert id="saveComment">
         insert into myblog.comment (nickname,email,content,avatar,createTime,blog_id,published,admin)
         values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{published},#{admin});
     </insert>
-    <insert id="saveReply" parameterType="com.tiankong44.model.Comment">
-        insert into myblog.comment_reply (nickname,email,content,avatar,createTime,blog_id,parent_comment_id,published,admin)
-        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{parentCommentId},#{published},#{admin});
+    <insert id="saveReply">
+        insert into myblog.comment_reply
+        (nickname,email,content,avatar,createTime,blog_id,parent_comment_id,published,admin)
+        values
+        (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{parentCommentId},#{published},#{admin});
     </insert>
 
 </mapper>

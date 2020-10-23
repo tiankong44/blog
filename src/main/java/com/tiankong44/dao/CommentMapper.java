@@ -1,6 +1,7 @@
 package com.tiankong44.dao;
 
 import com.tiankong44.model.Comment;
+import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -24,13 +25,24 @@ public interface CommentMapper {
 
     List<Comment> getALLReply();
 
-    void saveComment(Comment comment);
+    void saveComment(JSONObject reqJson);
 
-    void saveReply(Comment comment);
+    void saveReply(JSONObject reqJson);
 
     Comment getByParentCommentId(Long parentCommentId);
 
     List<Comment> getFiveNewComment();
 
     Comment getById(Long id);
+
+    /**
+     * 优化后的获取评论列表
+     *
+     * @param blogId
+     * @author zhanghao_SMEICS
+     * @Date 2020/10/23 11:10
+     * @return
+     */
+
+    List<Comment> getCommentsByBlogId(Long blogId);
 }

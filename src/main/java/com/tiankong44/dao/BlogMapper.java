@@ -37,6 +37,8 @@ public interface BlogMapper {
 
     void updateBlogPraise(Long id);
 
+    String getPraiseByBlogId(Long id);
+
     List<Long> getBlogIdByTagId(Long tag_id);
 
     List<Blog> getTopFiveViewBlog();

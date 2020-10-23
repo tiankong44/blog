@@ -1,13 +1,17 @@
 package com.tiankong44.util;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.FileUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @ClassName AvatarUtil
@@ -20,31 +24,39 @@ public class AvatarUtil {
 
     public static Image avatarAddText(String src, String text) throws IOException {
         // src = "G:\\Java\\IntelliJ_IDEA\\myblog\\src\\main\\resources\\static\\images\\avatar.jpg";
+        ImgUtil.pressText(
+                FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg"),
+                FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//out.jpg"),
+                text,
+                Color.WHITE,
+                new Font("黑体", Font.BOLD, 100), 0, 0, 0.8f);
+//        File srcImgFile = new File(src);
+//        Image srcImg = ImageIO.read(srcImgFile);
+//        int srcImgWidth = srcImg.getWidth(null);//获取图片的宽
+//        int srcImgHeight = srcImg.getHeight(null);//获取图片的高
+//        BufferedImage bufImg = new BufferedImage(srcImgWidth, srcImgHeight, BufferedImage.TYPE_INT_RGB);
+//        Graphics2D g = bufImg.createGraphics();
+//        g.drawImage(srcImg, 0, 0, srcImgWidth, srcImgHeight, null);
+//        g.setColor(Color.WHITE);
+//        text = text.substring(0, 1);
+//        Font font = null;
+//        if (isEnglish(text)) {
+//            font = new Font("宋体", Font.BOLD, 330);
+//            g.setFont(font);
+//            g.drawString(text, 60, 240);
+//            g.dispose();
+//        } else {
+//            font = new Font("宋体", Font.BOLD, 220);
+//            g.setFont(font);
+//            g.drawString(text, 40, 200);
+//            g.dispose();
+//        }
+//        FileOutputStream out = new FileOutputStream("E:\\GitRepo\\blog\\src\\main\\resources\\static\\images\\out.jpg");
+//        ImageIO.write(bufImg, "JPEG", out);
+//        out.close();
         File srcImgFile = new File(src);
-        Image srcImg = ImageIO.read(srcImgFile);
-        int srcImgWidth = srcImg.getWidth(null);//获取图片的宽
-        int srcImgHeight = srcImg.getHeight(null);//获取图片的高
-        BufferedImage bufImg = new BufferedImage(srcImgWidth, srcImgHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = bufImg.createGraphics();
-        g.drawImage(srcImg, 0, 0, srcImgWidth, srcImgHeight, null);
-        g.setColor(Color.WHITE);
-        text = text.substring(0, 1);
-        Font font = null;
-        if (isEnglish(text)) {
-            font = new Font("宋体", Font.BOLD, 330);
-            g.setFont(font);
-            g.drawString(text, 60, 240);
-            g.dispose();
-        } else {
-            font = new Font("宋体", Font.BOLD, 220);
-            g.setFont(font);
-            g.drawString(text, 40, 200);
-            g.dispose();
-        }
-        FileOutputStream out = new FileOutputStream("E:\\ideaIC-2019.3.4.win\\MyProject\\myblog\\src\\main\\resources\\static\\images\\out.jpg");
-        ImageIO.write(bufImg, "JPEG", out);
-        out.close();
-        return bufImg;
+    Image srcImg = ImageIO.read(srcImgFile);
+        return srcImg;
     }
 
     public static boolean isEnglish(String p) {

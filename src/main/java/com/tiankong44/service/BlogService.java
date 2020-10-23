@@ -38,8 +38,8 @@ public interface BlogService {
 
     void updateBlogViews(Long id);
 
-    void updateBlogPraise(Long id);
-
+    BaseRes updateBlogPraise(HttpServletRequest request, String msg);
+    BaseRes getComment(String msg);
     BaseRes getAllRecommendBlog();
 
     BaseRes getTopFiveViewBlog();
