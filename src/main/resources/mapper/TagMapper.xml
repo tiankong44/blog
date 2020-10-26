@@ -11,7 +11,7 @@
        insert into blog_tag(blog_id,tag_id) values(#{blog_id},#{tag_id});
      </insert>
     <select id="getAdminTag" resultType="com.tiankong44.model.Tag">
-        select * from myblog.tag
+        select * from myblog.tag where id !=0
      </select>
     <select id="getById" resultType="com.tiankong44.model.Tag">
         select * from myblog.tag where id=#{id}

@@ -24,12 +24,34 @@ public class AvatarUtil {
 
     public static Image avatarAddText(String src, String text) throws IOException {
         // src = "G:\\Java\\IntelliJ_IDEA\\myblog\\src\\main\\resources\\static\\images\\avatar.jpg";
-        ImgUtil.pressText(
-                FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg"),
-                FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//out.jpg"),
-                text,
-                Color.WHITE,
-                new Font("黑体", Font.BOLD, 100), 0, 0, 0.8f);
+        if (isEnglish(text)) {
+            char[] ch = text.toCharArray();
+            char letter = ch[0];
+            if (Character.isUpperCase(letter)) {
+                ImgUtil.pressText(
+                        FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg"),
+                        FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//out.jpg"),
+                        text.substring(0, 1),
+                        Color.WHITE,
+                        new Font("宋体", Font.BOLD, 260), 0, 185, 1.0f);
+            } else {
+                ImgUtil.pressText(
+                        FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg"),
+                        FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//out.jpg"),
+                        text.substring(0, 1),
+                        Color.WHITE,
+                        new Font("宋体", Font.BOLD, 330), 0, 200, 1.0f);
+            }
+        } else {
+            String letter = text.substring(0, 1);
+            ImgUtil.pressText(
+                    FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg"),
+                    FileUtil.file("E:/GitRepo/blog/src/main/resources/static//images//out.jpg"),
+                    letter.substring(0, 1),
+                    Color.WHITE,
+                    new Font("宋体", Font.BOLD, 220), -10, 160, 1.0f);
+        }
+
 //        File srcImgFile = new File(src);
 //        Image srcImg = ImageIO.read(srcImgFile);
 //        int srcImgWidth = srcImg.getWidth(null);//获取图片的宽
@@ -55,7 +77,7 @@ public class AvatarUtil {
 //        ImageIO.write(bufImg, "JPEG", out);
 //        out.close();
         File srcImgFile = new File(src);
-    Image srcImg = ImageIO.read(srcImgFile);
+        Image srcImg = ImageIO.read(srcImgFile);
         return srcImg;
     }
 
@@ -105,8 +127,8 @@ public class AvatarUtil {
     }
 
     public static void main(String[] args) throws IOException {
-        String src = "/images/avatar.jpg";
-        String text = "c";
+        String src = "E:/GitRepo/blog/src/main/resources/static//images//avatar.jpg";
+        String text = "测试";
         new AvatarUtil().avatarAddText(src, text);
     }
 }

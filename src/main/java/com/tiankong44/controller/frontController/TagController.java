@@ -1,69 +1,60 @@
 package com.tiankong44.controller.frontController;
 
+import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.service.BlogService;
 import com.tiankong44.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping
+import javax.servlet.http.HttpServletRequest;
+
+@RestController
+@RequestMapping("/tag")
 public class TagController {
     @Autowired
     private TagService tagService;
     @Autowired
     private BlogService blogService;
 
-//    @GetMapping("/tag")
-//    public String tag(Model model, @RequestParam(defaultValue = "1", value = "pageNum") Integer pageNum) {
-//        List<Tag> tagList = tagService.getAdminTag();
-//        PageHelper.startPage(pageNum, 8);
-//        List<Blog> blogList = blogService.getFirstPageBlog();
-//        PageInfo<Blog> pageInfo = new PageInfo<>(blogList);
-//        model.addAttribute("pageInfo", pageInfo);
-//        model.addAttribute("tagList", tagList);
-//
-//        return "tag";
-//    }
+    /**
+     * 获取标签列表
+     *
+     * @param request
+     * @param msg
+     * @return
+     * @author zhanghao_SMEICS
+     * @Date 2020/10/24 17:59
+     */
 
-//    @GetMapping("/tag/{id}")
-//    public String postData(@PathVariable Long id, Model model, @RequestParam(defaultValue = "1", value = "pageNum") Integer pageNum, HttpSession session) {
-//        session.setAttribute("tagId", id);
-//
-//        PageHelper.startPage(1, 8);
-//        List<Blog> blogList = tagService.getByTagId(id);
-//        PageInfo<Blog> pageInfo = new PageInfo<>(blogList);
-//        pageInfo.setPages(1);
-//        // System.out.println(pageInfo.getPages());
-//        //System.out.println(pageInfo.getTotal());
-//        model.addAttribute("pageInfo", pageInfo);
-//        List<Tag> tagList = tagService.getAdminTag();
-//        //  model.addAttribute("tagList", tagList);
-//
-//        return "tag :: blogList1";
-//    }
+    @RequestMapping({"/getTags"})
+    @ResponseBody
+    public BaseRes getTags() {
+        BaseRes res = new BaseRes();
+        res = this.tagService.getAdminTag();
+        return res;
 
-//    @PostMapping("/tag")
-//    @ResponseBody
-//    public BaseRes getBlogListByTagId(@RequestBody String msg) {
-//        BaseRes res = new BaseRes();
-//        res = tagService.getByTagId(msg);
-//        return res;
-//    }
+    }
 
-//    @GetMapping("/tag/{id}/search")
-//    public String search(@PathVariable Long id, Model model, @RequestParam(defaultValue = "2", value = "pageNum") Integer pageNum, HttpSession session) {
-//        session.setAttribute("tagId", id);
-//
-//        PageHelper.startPage(pageNum, 8);
-//        PageInfo<Blog> pageInfo = new PageInfo<>(tagService.getByTagId(id));
-//        // System.out.println(pageInfo.getPages());
-//        //System.out.println(pageInfo.getTotal());
-//        model.addAttribute("pageInfo", pageInfo);
-//        List<Tag> tagList = tagService.getAdminTag();
-//        model.addAttribute("tagList", tagList);
-//
-//        return "tag-result";
-//    }
+    /**
+     * 根据标签获取博客列表
+     *
+     * @param request
+     * @param msg
+     * @return
+     * @author zhanghao_SMEICS
+     * @Date 2020/10/24 17:59
+     */
+
+    @RequestMapping({"/getBlogList"})
+    @ResponseBody
+    public BaseRes getBlogList(HttpServletRequest request, @RequestBody String msg) {
+        BaseRes res = new BaseRes();
+        res = this.blogService.getBlogListByTagId(msg);
+        return res;
+
+    }
 
 }

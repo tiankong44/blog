@@ -20,16 +20,15 @@ public class TagsController {
     @Autowired
     private TagServiceImpl tagService;
 
-    @GetMapping("/tags")
-    public String tags(Model model,
-                       @RequestParam(defaultValue = "1", value = "pageNum") Integer pageNum) {
-        PageHelper.startPage(pageNum, 10);
-        List<Tag> tagList = tagService.getAdminTag();
-        PageInfo<Tag> pageInfo = new PageInfo<>(tagList);
-
-        model.addAttribute("pageInfo", pageInfo);
-        return "/admin/tags";
-    }
+//    @PostMapping("/tags")
+//    public BaseRes tags(){
+//        PageHelper.startPage(pageNum, 10);
+//        List<Tag> tagList = tagService.getAdminTag();
+//        PageInfo<Tag> pageInfo = new PageInfo<>(tagList);
+//
+//        model.addAttribute("pageInfo", pageInfo);
+//        return res;
+//    }
 
     //进入添加标签页面
     @GetMapping("/tags-input")

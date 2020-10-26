@@ -48,7 +48,7 @@ public interface BlogService {
 
     BaseRes getFiveNewCommentBlog();
 
-    List<Blog> getArchivingBlog();
+    BaseRes getArchivingBlog(String msg);
 
     BaseRes getFirstPageSearch(String msg);
 

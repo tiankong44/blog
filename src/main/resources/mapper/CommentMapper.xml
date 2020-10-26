@@ -46,8 +46,10 @@
     <select id="getById" resultType="com.tiankong44.model.Comment">
         select * from myblog.comment where id = #{id}
     </select>
-    <select id="getFiveNewComment" resultType="com.tiankong44.model.Comment">
-        select DISTINCT blog_id from myblog.comment where parent_comment_id IS null order by createTime DESC limit 5
+    <select id="getFiveNewComment" resultType="com.tiankong44.model.Blog">
+        SELECT DISTINCT b.id ,b.title FROM blog b ,comment c
+        WHERE  c.blog_id=b.id
+        order BY c.createTime ASC LIMIT 5
     </select>
 
     <select id="getCommentsByBlogId" resultMap="Comment">

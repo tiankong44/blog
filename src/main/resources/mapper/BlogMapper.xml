@@ -31,8 +31,11 @@
         <collection property="tags" ofType="com.tiankong44.model.Tag">
             <id column="tid" property="id"/>
             <result column="name" property="name"/>
+
         </collection>
     </resultMap>
+
+
     <select id="getUser" resultType="com.tiankong44.model.User">
         select id,nickname,avatar from myblog.user where id=#{user_id}
     </select>
@@ -79,8 +82,14 @@
         from myblog.blog b, myblog.user u ,tag t,blog_tag bt
         WHERE b.user_id=u.id AND published=1 AND bt.blog_id=b.id AND bt.tag_id=t.id and t.id=#{tagId}
     </select>
-    <select id="getArchivingBlog" resultType="com.tiankong44.model.Blog">
-        select id,title,description,createTime,views from myblog.blog Order by updateTime desc
+    <select id="getArchivingBlog" resultMap="Blog">
+        SELECT b.id,b.title,b.description,b.views,
+        DATE_FORMAT(b.createTime,'%Y-%m-%d') createTime,
+        DATE_FORMAT(b.updateTime,'%Y-%m-%d %H:%i:%s') updateTime,
+        u.nickname,u.avatar
+        from myblog.blog b, user u
+        WHERE b.user_id=u.id
+        ORDER BY b.createTime DESC
     </select>
 
 

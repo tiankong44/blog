@@ -10,6 +10,7 @@ import com.tiankong44.dao.BlogMapper;
 import com.tiankong44.dao.TagMapper;
 import com.tiankong44.model.Tag;
 import com.tiankong44.service.TagService;
+import com.tiankong44.util.ConstantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,8 +76,23 @@ public class TagServiceImpl implements TagService {
         return res;
     }
 
-    public List<Tag> getAdminTag() {
-        return this.tagMapper.getAdminTag();
+    /**
+     * 获取所有标签
+     *
+     * @param request
+     * @param msg
+     * @return
+     * @author zhanghao_SMEICS
+     * @Date 2020/10/24 18:28
+     */
+
+    public BaseRes getAdminTag() {
+        BaseRes res = new BaseRes();
+        List<Tag> tagList = tagMapper.getAdminTag();
+        res.setCode(ConstantUtil.RESULT_SUCCESS);
+        res.setData(tagList);
+        res.setDesc("标签列表获取成功");
+        return res;
     }
 
     public List<Tag> getTagsByBlogId(Long blog_id) {

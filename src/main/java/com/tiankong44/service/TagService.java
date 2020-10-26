@@ -27,7 +27,7 @@ public interface TagService {
 
     BaseRes getfirstPageTag();
 
-    List<Tag> getAdminTag();
+    BaseRes  getAdminTag();
 
     List<Tag> getTagsByBlogId(Long tag_id);
 }

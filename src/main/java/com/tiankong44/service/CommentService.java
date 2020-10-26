@@ -1,6 +1,7 @@
 package com.tiankong44.service;
 
 import com.tiankong44.base.entity.BaseRes;
+import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import com.tiankong44.model.User;
 
@@ -11,7 +12,7 @@ public interface CommentService {
 
     BaseRes saveComment(User user, String msg);
 
-    List<Comment> getFiveNewComment();
+    List<Blog> getFiveNewComment();
 
     List<Comment> getReplyByCommentId(Long id);
 

@@ -9,6 +9,7 @@ import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import com.tiankong44.model.Tag;
 import com.tiankong44.model.User;
+import com.tiankong44.model.vo.ArchiveVo;
 import com.tiankong44.service.BlogService;
 import com.tiankong44.service.CommentService;
 import com.tiankong44.util.*;
@@ -55,7 +56,7 @@ public class BlogServiceImpl implements BlogService {
 
     public BaseRes getBlogAndConvert(HttpSession session, String msg, HttpServletRequest request) {
         BaseRes res = new BaseRes();
-        new HashMap();
+        new TreeMap();
         JSONObject reqJson = JSONObject.fromObject(msg);
         Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, new String[]{"id"});
         if (checkMap != null) {
@@ -65,9 +66,9 @@ public class BlogServiceImpl implements BlogService {
         } else {
             Long id = reqJson.getLong("id");
             String ip = request.getRemoteAddr();
-            if (!this.redisUtil.hasKey(ip)) {
+            if (!this.redisUtil.hasKey(ip + id + "view")) {
                 this.blogMapper.updateBlogViews(id);
-                this.redisUtil.setEx(ip + id, ip + id, 3L, TimeUnit.DAYS);
+                this.redisUtil.setEx(ip + id + "view", ip + id, 3L, TimeUnit.DAYS);
             }
 
             Map blog = this.blogMapper.getBlogByBlogId(id);
@@ -117,7 +118,7 @@ public class BlogServiceImpl implements BlogService {
 
     public BaseRes getrecommend(HttpServletRequest request) {
         BaseRes res = new BaseRes();
-        Map<String, Object> resultMap = new HashMap();
+        Map<String, Object> resultMap = new TreeMap();
         String ip = request.getRemoteAddr();
         String blogTitle = "";
         String blogTag = "";
@@ -255,15 +256,15 @@ public class BlogServiceImpl implements BlogService {
 
     public BaseRes getFiveNewCommentBlog() {
         BaseRes res = new BaseRes();
-        Map<String, Object> blogMap = new HashMap();
-        List<Comment> commentList = this.commentService.getFiveNewComment();
-        List<Blog> blogList = new ArrayList();
-        Iterator it = commentList.iterator();
-
-        while (it.hasNext()) {
-            Comment comment = (Comment) it.next();
-            blogList.add(this.blogMapper.getBlogById(comment.getBlogId()));
-        }
+        Map<String, Object> blogMap = new TreeMap();
+        List<Blog> blogList = this.commentMapper.getFiveNewComment();
+//        List<Blog> blogList = new ArrayList();
+//        Iterator it = commentList.iterator();
+//
+//        while (it.hasNext()) {
+//            Comment comment = (Comment) it.next();
+//            blogList.add(this.blogMapper.getBlogById(comment.getBlogId()));
+//        }
 
         blogMap.put("blogList", blogList);
         res.setCode(0);
@@ -274,7 +275,7 @@ public class BlogServiceImpl implements BlogService {
 
     public BaseRes getTopFiveViewBlog() {
         BaseRes res = new BaseRes();
-        Map<String, Object> blogMap = new HashMap();
+        Map<String, Object> blogMap = new TreeMap();
         List<Blog> list = this.blogMapper.getTopFiveViewBlog();
         if (list != null && list.size() > 0) {
             blogMap.put("blogList", list);
@@ -291,7 +292,7 @@ public class BlogServiceImpl implements BlogService {
 
     public BaseRes getFiveNewBlog() {
         BaseRes res = new BaseRes();
-        Map<String, Object> blogMap = new HashMap();
+        Map<String, Object> blogMap = new TreeMap();
         List<Blog> list = this.blogMapper.getFiveNewBlog();
         if (list != null && list.size() > 0) {
             blogMap.put("blogList", list);
@@ -371,8 +372,67 @@ public class BlogServiceImpl implements BlogService {
         return res;
     }
 
-    public List<Blog> getArchivingBlog() {
-        return this.blogMapper.getArchivingBlog();
+    public BaseRes getArchivingBlog(String msg) {
+        BaseRes res = new BaseRes();
+        Map result = new HashMap();
+        JSONObject reqJson = null;
+        List<ArchiveVo> archiveVos = new ArrayList<>();
+        int pageNum;
+        int pageSize;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "pageNum", "pageSize");
+            if (checkMap != null) {
+                res.setCode(1);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+
+            pageNum = reqJson.getInt("pageNum");
+            pageSize = reqJson.getInt("pageSize");
+            PageHelper.startPage(pageNum, pageSize);
+            List<Blog> blogList = blogMapper.getArchivingBlog();
+            PageInfo<Map> pageInfo = new PageInfo(blogList);
+
+            result.put("pageInfo", pageInfo);
+//        Map<String, List<Blog>> blogMap = new TreeMap<>();
+            List<String> dateList = new ArrayList<>();
+
+
+            for (int i = 0; i < blogList.size(); i++) {
+
+                String date = blogList.get(i).getCreateTime();
+                if (dateList.contains(date)) {
+
+                    for (ArchiveVo archiveVo : archiveVos) {
+                        if (archiveVo.getDate().equals(date)) {
+                            archiveVo.getList().add(blogList.get(i));
+                        }
+                    }
+
+                } else {
+                    dateList.add(date);
+                    ArchiveVo archiveVo = new ArchiveVo();
+                    archiveVo.setDate(date);
+                    List dateList1 = new ArrayList();
+                    dateList1.add(blogList.get(i));
+                    archiveVo.setList(dateList1);
+                    archiveVos.add(archiveVo);
+                }
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(1);
+            res.setDesc("请求参数异常");
+            return res;
+        }
+        result.put("data", archiveVos);
+        res.setCode(ConstantUtil.RESULT_SUCCESS);
+        res.setData(result);
+        res.setDesc("归档列表获取成功");
+        return res;
     }
 
     public void updateBlogViews(Long id) {
@@ -393,7 +453,7 @@ public class BlogServiceImpl implements BlogService {
             return res;
         }
         Long id = reqJson.getLong("id");
-        String ip = request.getRemoteAddr() + id + "view";
+        String ip = request.getRemoteAddr() + id + "praise";
         if (redisUtil.hasKey(ip)) {
             res.setCode(ConstantUtil.RESULT_FAILED);
             res.setDesc("你已经点过赞了！");

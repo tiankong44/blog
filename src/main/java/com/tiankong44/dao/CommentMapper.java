@@ -1,5 +1,6 @@
 package com.tiankong44.dao;
 
+import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Mapper;
@@ -31,7 +32,7 @@ public interface CommentMapper {
 
     Comment getByParentCommentId(Long parentCommentId);
 
-    List<Comment> getFiveNewComment();
+    List<Blog> getFiveNewComment();
 
     Comment getById(Long id);
 

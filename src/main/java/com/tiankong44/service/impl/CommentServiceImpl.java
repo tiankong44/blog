@@ -3,6 +3,7 @@ package com.tiankong44.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.dao.CommentMapper;
+import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import com.tiankong44.model.User;
 import com.tiankong44.service.CommentService;
@@ -100,7 +101,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getFiveNewComment() {
+    public List<Blog> getFiveNewComment() {
         return commentMapper.getFiveNewComment();
     }
 
