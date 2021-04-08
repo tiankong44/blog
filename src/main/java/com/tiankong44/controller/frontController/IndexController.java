@@ -9,10 +9,7 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -26,15 +23,11 @@ public class IndexController {
     private TagServiceImpl tagService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public IndexController() {
-    }
 
 
     /**
      * 获取最新5篇博客
      *
-     * @param request
-     * @param msg
      * @return
      * @author zhanghao_SMEICS
      * @Date 2020/10/24 17:52
@@ -51,8 +44,6 @@ public class IndexController {
     /**
      * 获取最新5条评论的文章
      *
-     * @param request
-     * @param msg
      * @return
      * @author zhanghao_SMEICS
      * @Date 2020/10/24 17:52
@@ -69,8 +60,6 @@ public class IndexController {
     /**
      * 获取浏览量最高的5篇博客
      *
-     * @param request
-     * @param msg
      * @return
      * @author zhanghao_SMEICS
      * @Date 2020/10/24 17:53
@@ -87,7 +76,6 @@ public class IndexController {
     /**
      * 获取博客列表
      *
-     * @param request
      * @param msg
      * @return
      * @author zhanghao_SMEICS
@@ -124,8 +112,6 @@ public class IndexController {
     /**
      * 获取首页标签列表
      *
-     * @param request
-     * @param msg
      * @return
      * @author zhanghao_SMEICS
      * @Date 2020/10/24 17:54
@@ -144,7 +130,6 @@ public class IndexController {
      * 余弦相似度算法
      *
      * @param request
-     * @param msg
      * @return
      * @author zhanghao_SMEICS
      * @Date 2020/10/24 17:55

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tiankong44.dao.TestMapper">
+    <insert id="insrt" parameterType="com.tiankong44.model.Student">
+        insert into myblog.student(age,name)values(#{age},#{name})
+    </insert>
+
+
+    <update id="test" parameterType="java.util.Map">
+        <foreach collection="list" item="item" index="index" open="" close=";" separator=";">
+            update myblog.student
+            <set>
+                age=#{item.age},update_time=#{updateTime}
+            </set>
+            where id =#{item.id}
+        </foreach>
+
+    </update>
+
+    <update id="test2" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close=";" separator=";"></foreach>
+        update myblog.student s
+        <set>
+            s.age=${item.age}
+        </set>
+        where s.id =${item.id}
+    </update>
+
+    <update id="test3" parameterType="java.util.Map">
+        update student
+        set
+        update_time=(select ut.updateTime from (SELECT DATE_ADD( (SELECT s.update_time from student s where id= #{item.id}),
+        INTERVAL 7 DAY) as updateTime) as ut)
+        where id in
+        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+
+
+    </update>
+    <select id="test4" resultType="java.util.Map">
+
+        select DATE_FORMAT((select ut.updateTime from (SELECT DATE_ADD( (SELECT s.update_time from student s where id= #{item.id}),
+        INTERVAL 7 DAY) as updateTime) as ut),"%Y-%m-%d %H:%i:%S") as updateTime
+        from student
+        where id in
+        <foreach collection="list" item="orderNo" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </select>
+</mapper>

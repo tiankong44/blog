@@ -95,9 +95,10 @@ public class BlogController {
 
     @PostMapping("/comments")
     @ResponseBody
-    public BaseRes save(HttpServletRequest request, @RequestBody String msg, HttpSession session) throws Exception {
+    public BaseRes save(HttpServletRequest request, @RequestBody String msg) throws Exception {
         BaseRes res = new BaseRes();
-        User user = (User) session.getAttribute("user");
+//        User user = (User) session.getAttribute("user");
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
         res = commentService.saveComment(user, msg);
         return res;
     }

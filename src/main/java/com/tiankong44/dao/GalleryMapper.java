@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface GalleryMapper {
 
-    void saveImg(Gallery Gallery);
+    boolean saveImg(Gallery Gallery);
 
     List<Gallery> listImg(Long id);
 
@@ -22,4 +22,6 @@ public interface GalleryMapper {
     Gallery findImgById(Long id);
 
     List<Gallery> findImgByDate(Date oldDate, Date newDate, Long id);
+
+
 }

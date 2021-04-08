@@ -2,6 +2,7 @@ package com.tiankong44.dao;
 
 import com.tiankong44.model.Blog;
 import com.tiankong44.model.User;
+import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -25,13 +26,13 @@ public interface BlogMapper {
 
     Long getUserIdByBlogId(Long id);
 
-    void saveBlog(Blog blog);
+    boolean saveBlog(Blog blog);
 
     User getUser(Long user_id);
 
-    void deleteBlog(Long id);
+    boolean deleteBlog(Long id);
 
-    void updateBlog(Blog blog);
+    boolean updateBlog(Blog blog);
 
     void updateBlogViews(Long id);
 
@@ -54,4 +55,14 @@ public interface BlogMapper {
     List<Blog> getByCondition(String title, List<Long> ids, boolean recommend);
 
     List<Blog> getBlogListByTagId(Long tagId);
+
+    List<Long> queryBlogIdList(Map<String, Object> paramMap);
+
+    List<Blog> queryBlogList(List<Long> list);
+
+
+    Blog getBlogDetailById(long blogId);
+
+
+    List<Long>  getBlogIdByTagIdAndUserId(JSONObject reqJson);
 }

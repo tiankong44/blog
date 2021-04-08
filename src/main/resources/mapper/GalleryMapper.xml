@@ -22,4 +22,6 @@
     <select id="findImgById" resultType="com.tiankong44.model.Gallery">
         select imgName from myblog.gallery where id=#{id}
      </select>
+
+
 </mapper>

@@ -2,39 +2,52 @@ package com.tiankong44.dao;
 
 import com.tiankong44.model.Blog;
 import com.tiankong44.model.Tag;
+import com.tiankong44.model.vo.TagVo;
+import com.tiankong44.model.vo.UserTag;
+import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Mapper
 public interface TagMapper {
-    void saveTag(Tag tag);
+    boolean saveTag(Tag tag);
 
-    void saveBlogAndTag(Long blog_id, Long tag_id);
+    int saveBlogAndTag(Map<String, Object> paramMap);
 
-    int deleteTag(Long id);
+    boolean deleteTag(JSONObject reqJson);
 
-    void deleteBlogAndTag(Long blog_id);
+    boolean deleteBlogAndTag(Long blog_id);
 
+    boolean deleteBlogAndTags(List<Long> list);
     void updateTag(Tag tag);
 
-    void updateBlogAndTag(Long blog_id, Long tag_id);
+
 
     Tag getById(Long id);
 
     List<Tag> getfirstPageTag();
 
-    List<Tag> getSearch(String name);
 
     Tag getByName(String name);
-
-    List<Tag> getAllTag();
 
     List<Tag> getTagsByBlogId(Long blog_id);
 
     List<Tag> getAdminTag();
 
     List<Blog> getByTagId(Long tagId);
+
+    List<TagVo> getTagsByUserId(Long userId);
+
+    boolean saveTagAndUser(Long tagId, Long userId);
+
+
+    List<TagVo> queryTagList(JSONObject reqJson);
+
+    boolean deleteTagAndUser(JSONObject reqJson);
+
+    UserTag getTagByUserIdAndTagId(JSONObject reqJson);
 }

@@ -16,9 +16,11 @@ import java.util.List;
 public interface BlogService {
     Blog getBlogById(Long id);
 
+    BaseRes getBlogDetail(String msg, HttpServletRequest request);
+
     BaseRes getBlogAndConvert(HttpSession session, String msg, HttpServletRequest request);
 
-    List<Blog> getBlogByUserId(Long user_id);
+    BaseRes queryBlogList(String msg, HttpServletRequest request);
 
     List<Blog> getAllBlog();
 
@@ -28,18 +30,19 @@ public interface BlogService {
 
     User getUser(Long user_id);
 
-    void saveBlog(Blog blog);
+    BaseRes saveBlog(String msg, HttpServletRequest request);
 
-    Long getMaxBlogId();
 
-    void deleteBlog(Long id);
 
-    void updateBlog(Blog blog);
+    BaseRes deleteBlog(String msg);
+
 
     void updateBlogViews(Long id);
 
     BaseRes updateBlogPraise(HttpServletRequest request, String msg);
+
     BaseRes getComment(String msg);
+
     BaseRes getAllRecommendBlog();
 
     BaseRes getTopFiveViewBlog();
@@ -52,11 +55,9 @@ public interface BlogService {
 
     BaseRes getFirstPageSearch(String msg);
 
-    List<Blog> getByCondition(String title, List<Long> ids, boolean recommend);
-
-    List<Long> getBlogIdByTagId(Long tag_id);
-
     BaseRes getrecommend(HttpServletRequest request);
 
     BaseRes getBlogListByTagId(String msg);
+
+    BaseRes updateBlog(String msg, HttpServletRequest request);
 }

@@ -1,14 +1,20 @@
 package com.tiankong44.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.dao.AlbumMapper;
 import com.tiankong44.model.Album;
 import com.tiankong44.service.AlbumService;
-import com.tiankong44.util.DateUtils;
+import com.tiankong44.util.ConstantUtil;
+import com.tiankong44.util.JsonUtils;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName AlbumServiceImpl
@@ -51,16 +57,41 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public List<Album> listAlbum() {
+    public BaseRes listAlbum(String msg) {
 
-        List<Album> dateList = albumMapper.getAllDate();
-        for (Album day : dateList) {
-            List<Album> dayList = albumMapper.findImgByGroupDate(DateUtils.dateToString(day.getUploadDate(), DateUtils.DEFAULT_DATE_PATTERN));
-
-            day.setAlbumList(dayList);
-
+        BaseRes res = new BaseRes();
+        JSONObject reqJson = null;
+        int pageNum;
+        int pageSize;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "pageNum", "pageSize");
+            if (checkMap != null) {
+                res.setCode(1);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+            pageNum = reqJson.getInt("pageNum");
+            pageSize = reqJson.getInt("pageSize");
+            PageHelper.startPage(pageNum, pageSize);
+            List<Album> dateList = albumMapper.getAllDate();
+            PageInfo<Album> pageInfo = new PageInfo(dateList);
+            for (Album day : dateList) {
+                List<Album> dayList = albumMapper.findImgByGroupDate(day.getUploadDate());
+                day.setAlbumList(dayList);
+            }
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setDesc("相册查询成功");
+            res.setData(pageInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(1);
+            res.setDesc("请求参数异常");
+            return res;
         }
-        return dateList;
+
+
+        return res;
     }
 
     @Override

@@ -22,7 +22,6 @@ public class Tokenizer {
 
         //1、 采用HanLP中文自然语言处理中标准分词进行分词
         List<Term> termList = HanLP.segment(sentence);
-       System.out.println(termList);
         //上面控制台打印信息就是这里输出的
 
         //2、重新封装到Word对象中（term.word代表分词后的词语，term.nature代表改词的词性）

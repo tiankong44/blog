@@ -22,8 +22,9 @@ public class GalleryServiceImpl implements GalleryService {
     }
 
     @Override
-    public void saveImg(Gallery Gallery) {
-        galleryMapper.saveImg(Gallery);
+    public boolean saveImg(Gallery Gallery) {
+        boolean flag = galleryMapper.saveImg(Gallery);
+        return flag;
     }
 
     @Override

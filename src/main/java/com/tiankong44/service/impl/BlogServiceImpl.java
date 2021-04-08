@@ -1,10 +1,13 @@
 package com.tiankong44.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.dao.BlogMapper;
 import com.tiankong44.dao.CommentMapper;
+import com.tiankong44.dao.TagMapper;
 import com.tiankong44.model.Blog;
 import com.tiankong44.model.Comment;
 import com.tiankong44.model.Tag;
@@ -36,11 +39,53 @@ public class BlogServiceImpl implements BlogService {
     private RedisUtil redisUtil;
     @Autowired
     private CommentMapper commentMapper;
+    @Autowired
+    private TagMapper tagMapper;
 
     public BlogServiceImpl() {
     }
 
+    public BaseRes getBlogDetail(String msg, HttpServletRequest request) {
+        BaseRes res = new BaseRes();
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        if (user == null) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请先登录！");
+            return res;
+        }
+        Long userId = user.getId();
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "blogId");
+            if (checkMap != null) {
+                res.setCode(ConstantUtil.RESULT_FAILED);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请求参数错误");
+            return res;
+        }
+
+        Blog blog = blogMapper.getBlogDetailById(Long.parseLong(reqJson.getString("blogId")));
+        if (blog != null) {
+            res.setData(blog);
+            res.setDesc("博客详情查询成功");
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+        } else {
+            res.setDesc("系统错误");
+            res.setCode(ConstantUtil.RESULT_FAILED);
+        }
+        return res;
+    }
+
     public Blog getBlogById(Long id) {
+        BaseRes res = new BaseRes();
+
         Blog blog = this.blogMapper.getBlogById(id);
         List<Tag> tagList = this.tagService.getTagsByBlogId(blog.getId());
         blog.setTags(tagList);
@@ -50,9 +95,6 @@ public class BlogServiceImpl implements BlogService {
         return blog;
     }
 
-    public List<Blog> getByCondition(String title, List<Long> ids, boolean recommend) {
-        return this.blogMapper.getByCondition(title, ids, recommend);
-    }
 
     public BaseRes getBlogAndConvert(HttpSession session, String msg, HttpServletRequest request) {
         BaseRes res = new BaseRes();
@@ -135,14 +177,13 @@ public class BlogServiceImpl implements BlogService {
             blogDesc = this.redisUtil.get(ip + "blogDesc");
         }
 
-        List<Blog> blogs = this.getAllBlog();
+        List<Blog> blogs = blogMapper.getAllBlog();
         List<Blog> tblogs = new ArrayList();
         Map<Long, Double> blogMap = new TreeMap();
         if (blogTitle == null) {
             res.setData(tblogs);
             res.setCode(0);
             res.setDesc("暂时没有推荐的博客");
-            return res;
         } else {
             int titleLen = blogTitle.length();
             String subTitlestr = "";
@@ -165,14 +206,13 @@ public class BlogServiceImpl implements BlogService {
             String blogTagStr = blogTag.replace("null", "");
             String blogDescStr = subDescstr.replace("null", "");
             blogDescStr = blogDescStr.replaceAll("-", "");
-            Iterator var18 = blogs.iterator();
+            Iterator iterator = blogs.iterator();
 
-            while (var18.hasNext()) {
-                Blog blog = (Blog) var18.next();
+            while (iterator.hasNext()) {
+                Blog blog = (Blog) iterator.next();
                 double d0 = CosineSimilarity.getSimilarity(blogTitlestr, blog.getTitle());
-                List<Tag> tagList = this.tagService.getTagsByBlogId(blog.getId());
+                List<Tag> tagList = blog.getTags();
                 String showTags = " ";
-
                 Tag tag;
                 for (Iterator it = tagList.iterator(); it.hasNext(); showTags = showTags + tag.getName()) {
                     tag = (Tag) it.next();
@@ -182,7 +222,7 @@ public class BlogServiceImpl implements BlogService {
                 double d1 = CosineSimilarity.getSimilarity(blogTagStr, blog.getShowTags());
                 double d2 = CosineSimilarity.getSimilarity(blogDescStr, blog.getDescription());
                 double d = d0 * 0.25D + d1 * 0.5D + d2 * 0.25D;
-                System.out.println("d:" + d + "================");
+
                 if (d >= 0.25D) {
                     blogMap.put(blog.getId(), d);
                 }
@@ -213,12 +253,88 @@ public class BlogServiceImpl implements BlogService {
             res.setCode(0);
             res.setData(resultMap);
             res.setDesc("已向您推荐一些博客");
-            return res;
         }
+        return res;
     }
 
-    public List<Blog> getBlogByUserId(Long user_id) {
-        return this.blogMapper.getBlogByUserId(user_id);
+    public BaseRes queryBlogList(String msg, HttpServletRequest request) {
+        BaseRes res = new BaseRes();
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        if (user == null) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请先登录！");
+            return res;
+        }
+        Long id = user.getId();
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "pageNum", "pageSize");
+            if (checkMap != null) {
+                res.setCode(ConstantUtil.RESULT_FAILED);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请求参数错误");
+            return res;
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+
+
+        if (reqJson.containsKey("tagIds")) {
+            String tagIds = reqJson.getString("tagIds");
+            String tags[] = tagIds.split(",");
+            if (!StringUtil.isEmpty(tagIds)) {
+                paramMap.put("list", tags);
+            }
+        }
+        paramMap.put("userId", id);
+        if (reqJson.containsKey("title")) {
+            String title = reqJson.getString("title");
+            if (!StringUtil.isEmpty(title)) {
+                paramMap.put("title", title);
+            }
+        }
+        if (reqJson.containsKey("recommend")) {
+//            String recommend = reqJson.getString("recommend");
+            boolean flag = reqJson.getBoolean("recommend");
+            if (flag) {
+                paramMap.put("recommend", 1);
+            } else {
+                paramMap.put("recommend", 0);
+            }
+
+        }
+        PageHelper.startPage(reqJson.getInt("pageNum"), reqJson.getInt("pageSize"), true);
+        List<Long> blogIdList = blogMapper.queryBlogIdList(paramMap);
+        PageInfo<Long> pageInfo = null;
+        List<Blog> blogList = new ArrayList<>();
+        if (blogIdList.size() > 0) {
+            blogList = blogMapper.queryBlogList(blogIdList);
+            pageInfo = new PageInfo<Long>(blogIdList);
+        } else {
+            pageInfo = new PageInfo<Long>(new ArrayList<>());
+        }
+        PageInfo<Blog> blogPageInfo = new PageInfo<Blog>();
+        blogPageInfo.setList(blogList);
+        blogPageInfo.setHasPreviousPage(pageInfo.isHasPreviousPage());
+        blogPageInfo.setHasNextPage(pageInfo.isHasNextPage());
+        blogPageInfo.setEndRow(pageInfo.getEndRow());
+        blogPageInfo.setNavigateFirstPage(pageInfo.getNavigateFirstPage());
+        blogPageInfo.setTotal(pageInfo.getTotal());
+        blogPageInfo.setPages(pageInfo.getPages());
+        blogPageInfo.setPrePage(pageInfo.getPrePage());
+        blogPageInfo.setNextPage(pageInfo.getNextPage());
+        blogPageInfo.setPageNum(pageInfo.getPageNum());
+
+        res.setCode(ConstantUtil.RESULT_SUCCESS);
+        res.setDesc("博客列表查询成功");
+        res.setData(blogPageInfo);
+        return res;
     }
 
     public List<Blog> getAllBlog() {
@@ -233,20 +349,224 @@ public class BlogServiceImpl implements BlogService {
         return this.blogMapper.getUser(user_id);
     }
 
-    public void saveBlog(Blog blog) {
-        this.blogMapper.saveBlog(blog);
+    @Transactional(rollbackFor = Exception.class)
+    public BaseRes saveBlog(String msg, HttpServletRequest request) {
+        BaseRes res = new BaseRes();
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        if (user == null) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请先登录！");
+            return res;
+        }
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "title", "content", "description", "published", "commentabled", "appreciation", "tagIds");
+            if (checkMap != null) {
+                res.setCode(ConstantUtil.RESULT_FAILED);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String tagIds = reqJson.getString("tagIds");
+        String[] tags = tagIds.split(",");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String tagStr : tags) {
+            //检查是否新增标签
+            Long tagId = null;
+            Tag tag = null;
+            try {
+                tagId = Long.parseLong(tagStr);
+            } catch (Exception e) {
+                tagId = 0L;
+            }
+            tag = tagService.getById(tagId);
+
+            if (tag == null) {
+                //新增标签
+                tag = new Tag();
+                tag.setName(tagStr);
+                Long saveTagId = tagService.saveTag(tag, user);
+                stringBuilder.append(saveTagId.toString()).append(",");
+
+                //新增标签和用户关系
+            } else {
+                stringBuilder.append(tagStr).append(",");
+            }
+        }
+        Blog blog = new Blog();
+        blog.setTitle(reqJson.getString("title"));
+        blog.setContent(reqJson.getString("content"));
+
+        if (reqJson.containsKey("firstPic") && !StringUtil.isEmpty(reqJson.getString("firstPic"))) {
+            blog.setFirstPicture(reqJson.getString("firstPic"));
+        } else {
+
+            blog.setFirstPicture(ConstantUtil.DEFAULTFIRSTPIC);
+        }
+        blog.setDescription(reqJson.getString("description"));
+        boolean published = reqJson.getBoolean("published");
+        blog.setPublished(published);
+        boolean commentabled = reqJson.getBoolean("commentabled");
+        blog.setCommentabled(commentabled);
+
+        boolean appreciation = reqJson.getBoolean("appreciation");
+        blog.setAppreciation(appreciation);
+        String newTagIds = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+        blog.setTag_ids(newTagIds);
+        String createTime = DateUtil.format(new Date(), "yyyy-MM-dd hh:mm:ss");
+        blog.setCreateTime(createTime);
+        blog.setUpdateTime(createTime);
+        blog.setUserId(user.getId());
+        boolean flag = blogMapper.saveBlog(blog);
+        if (!flag) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("新增博客失败！");
+            return res;
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("blogId", blog.getId());
+        paramMap.put("list", newTagIds.split(","));
+        int num = tagMapper.saveBlogAndTag(paramMap);
+        if (num > 0) {
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setDesc("新增博客成功");
+        } else {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("新增博客失败！");
+        }
+        return res;
     }
 
-    public Long getMaxBlogId() {
-        return this.blogMapper.getMaxBlogId();
+    @Override
+    public BaseRes updateBlog(String msg, HttpServletRequest request) {
+        BaseRes res = new BaseRes();
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        if (user == null) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请先登录！");
+            return res;
+        }
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "blogId", "title", "firstPic", "content", "description", "published", "commentabled", "appreciation", "tagIds");
+            if (checkMap != null) {
+                res.setCode(ConstantUtil.RESULT_FAILED);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String tagIds = reqJson.getString("tagIds");
+        String[] tags = tagIds.split(",");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String tagStr : tags) {
+            //检查是否新增标签
+            Long tagId = null;
+            Tag tag = null;
+            try {
+                tagId = Long.parseLong(tagStr);
+            } catch (Exception e) {
+                tagId = 0L;
+            }
+            tag = tagService.getById(tagId);
+
+            if (tag == null) {
+                //新增标签
+                tag = new Tag();
+                tag.setName(tagStr);
+                Long saveTagId = tagService.saveTag(tag, user);
+                stringBuilder.append(saveTagId.toString()).append(",");
+
+                //新增标签和用户关系
+            } else {
+                stringBuilder.append(tagStr).append(",");
+            }
+        }
+
+        Blog blog = new Blog();
+        blog.setId(Long.parseLong(reqJson.getString("blogId")));
+        blog.setTitle(reqJson.getString("title"));
+        blog.setContent(reqJson.getString("content"));
+        if (reqJson.containsKey("firstPic") && !StringUtil.isEmpty(reqJson.getString("firstPic"))) {
+            blog.setFirstPicture(reqJson.getString("firstPic"));
+        } else {
+
+            blog.setFirstPicture(ConstantUtil.DEFAULTFIRSTPIC);
+        }
+        blog.setDescription(reqJson.getString("description"));
+        boolean published = reqJson.getBoolean("published");
+        blog.setPublished(published);
+        boolean commentabled = reqJson.getBoolean("commentabled");
+        blog.setCommentabled(commentabled);
+
+        boolean appreciation = reqJson.getBoolean("appreciation");
+        blog.setAppreciation(appreciation);
+        String newTagIds = stringBuilder.toString().substring(0, stringBuilder.toString().length() - 1);
+        blog.setTag_ids(newTagIds);
+        String createTime = DateUtil.format(new Date(), "yyyy-MM-dd hh:mm:ss");
+//        blog.setCreateTime(createTime);
+        blog.setUpdateTime(createTime);
+        blog.setUserId(user.getId());
+        boolean flag = blogMapper.updateBlog(blog);
+        if (!flag) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("编辑博客失败！");
+            return res;
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        tagMapper.deleteBlogAndTag(blog.getId());
+
+        paramMap.put("blogId", blog.getId());
+        paramMap.put("list", newTagIds.split(","));
+        int num = tagMapper.saveBlogAndTag(paramMap);
+        if (num > 0) {
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setDesc("编辑博客成功");
+        } else {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("编辑博客失败！");
+        }
+        return res;
     }
 
-    public void deleteBlog(Long id) {
-        this.blogMapper.deleteBlog(id);
-    }
-
-    public void updateBlog(Blog blog) {
-        this.blogMapper.updateBlog(blog);
+    public BaseRes deleteBlog(String msg) {
+        BaseRes res = new BaseRes();
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "blogId");
+            if (checkMap != null) {
+                res.setCode(ConstantUtil.RESULT_FAILED);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String blogId = reqJson.getString("blogId");
+        boolean flag = false;
+        flag = blogMapper.deleteBlog(Long.parseLong(blogId));
+        if (!flag) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("博客删除失败");
+            return res;
+        }
+        flag = tagMapper.deleteBlogAndTag(Long.parseLong(blogId));
+        if (!flag) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("博客删除失败");
+        } else {
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setDesc("博客删除成功");
+        }
+        return res;
     }
 
     public BaseRes getAllRecommendBlog() {
@@ -258,14 +578,6 @@ public class BlogServiceImpl implements BlogService {
         BaseRes res = new BaseRes();
         Map<String, Object> blogMap = new TreeMap();
         List<Blog> blogList = this.commentMapper.getFiveNewComment();
-//        List<Blog> blogList = new ArrayList();
-//        Iterator it = commentList.iterator();
-//
-//        while (it.hasNext()) {
-//            Comment comment = (Comment) it.next();
-//            blogList.add(this.blogMapper.getBlogById(comment.getBlogId()));
-//        }
-
         blogMap.put("blogList", blogList);
         res.setCode(0);
         res.setData(blogMap);
@@ -282,12 +594,11 @@ public class BlogServiceImpl implements BlogService {
             res.setCode(0);
             res.setData(blogMap);
             res.setDesc("浏览量最高的五篇博客查询成功");
-            return res;
         } else {
             res.setCode(1);
             res.setDesc("浏览量最高的五篇博客查询失败");
-            return res;
         }
+        return res;
     }
 
     public BaseRes getFiveNewBlog() {
@@ -497,10 +808,6 @@ public class BlogServiceImpl implements BlogService {
         return res;
     }
 
-    public List<Long> getBlogIdByTagId(Long tag_id) {
-        return this.blogMapper.getBlogIdByTagId(tag_id);
-    }
-
     public BaseRes getBlogListByTagId(String msg) {
         BaseRes res = new BaseRes();
         JSONObject reqJson = null;
@@ -534,4 +841,6 @@ public class BlogServiceImpl implements BlogService {
         res.setData(pageInfo);
         return res;
     }
+
+
 }

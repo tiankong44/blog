@@ -33,12 +33,12 @@ public class AlbumUpLoadController {
         String path = "";
         Long userId = (Long) request.getSession().getAttribute("user_id");
         for (MultipartFile mf : img) {
-            String uuid = UUID.randomUUID().toString().replaceAll("-","");
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
             path = QiniuUpload.updateFile(mf, uuid);
             album.setImgName(uuid);
             album.setPath(path);
             Date date = new Date();
-            album.setUploadDate(date);
+            album.setUploadDate(date.toString());
             album.setUserId(userId);
             albumService.saveImg(album);
         }

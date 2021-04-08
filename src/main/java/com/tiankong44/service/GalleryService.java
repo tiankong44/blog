@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface GalleryService {
-    void saveImg(Gallery Gallery);
+    boolean saveImg(Gallery Gallery);
 
     void deleteImg(Long id);
 

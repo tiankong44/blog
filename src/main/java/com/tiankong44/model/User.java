@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class User {
+    public static final String SESSION_KEY = User.class.getName();
     private Long id;
     private String username;
     private String password;

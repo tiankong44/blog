@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +26,7 @@ public class Album {
     private Long userId;
 
     //更新时间
-    private Date uploadDate;
+    private String uploadDate;
 
     List<Album> albumList = new ArrayList<>();
 }

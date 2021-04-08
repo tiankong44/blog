@@ -5,53 +5,83 @@
 <mapper namespace="com.tiankong44.dao.TagMapper">
 
     <insert id="saveTag" parameterType="com.tiankong44.model.Tag">
-       insert into tag(name) values(#{name});
-     </insert>
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into tag(name) values(#{name});
+    </insert>
     <insert id="saveBlogAndTag">
-       insert into blog_tag(blog_id,tag_id) values(#{blog_id},#{tag_id});
-     </insert>
+        insert into blog_tag(blog_id,tag_id)
+        values
+        <foreach collection="list" item="tagId" index="index" separator=",">
+            ( #{blogId},#{tagId} )
+        </foreach>;
+    </insert>
+
     <select id="getAdminTag" resultType="com.tiankong44.model.Tag">
         select * from myblog.tag where id !=0
-     </select>
+    </select>
     <select id="getById" resultType="com.tiankong44.model.Tag">
         select * from myblog.tag where id=#{id}
-     </select>
+    </select>
     <select id="getByTagId" resultType="com.tiankong44.model.Blog">
-  select bt.blog_id id,b.title,b.firstPicture,b.content,b.appreciation,b.commentabled,b.createTime,b.views ,b.description from myblog.blog_tag bt,myblog.blog b
-  where tag_id=#{tagId} AND bt.blog_id=b.id
-     </select>
+        select bt.blog_id id,b.title,b.firstPicture,b.content,b.appreciation,b.commentabled,b.createTime,b.views ,b.description from myblog.blog_tag bt,myblog.blog b
+        where tag_id=#{tagId} AND bt.blog_id=b.id
+    </select>
     <select id="getByName" resultType="com.tiankong44.model.Tag">
-        select * from myblog.tag where name like #{name}
-     </select>
-    <select id="getSearch" resultType="com.tiankong44.model.Tag">
-        select * from myblog.tag where name like "%"#{name}"%"
-     </select>
+        select * from myblog.tag where binary name =#{name}
+    </select>
+
     <select id="getfirstPageTag" resultType="com.tiankong44.model.Tag">
-        select * from myblog.tag  limit 16
-     </select>
+        select * from myblog.tag limit 16
+    </select>
     <select id="getTagsByBlogId" resultType="com.tiankong44.model.Tag">
-        select * from tag  where id in(select  tag_id from myblog.blog_tag where blog_id=#{blog_id})
-     </select>
+        select * from tag where id in(select tag_id from myblog.blog_tag where blog_id=#{blog_id})
+    </select>
 
 
-    <delete id="deleteTag" >
-            delete from myblog.tag where id = #{id}
-        </delete>
+    <delete id="deleteTag">
+        delete from myblog.tag where id = #{tagId}
+    </delete>
     <delete id="deleteBlogAndTag">
-            delete from myblog.blog_tag where blog_id = #{blog_id}
-        </delete>
+        delete from myblog.blog_tag where blog_id = #{blog_id}
+    </delete>
+
+
     <update id="updateTag" parameterType="com.tiankong44.model.Tag">
         update tag set name = #{name} where id = #{id};
     </update>
-    <update id="updateBlogAndTag">
-        update blog_tag set tag_id = #{tag_id} where blog_id = #{blog_id};
-    </update>
-    <!--
 
-        <select id="findImgByDate" resultType="com.tiankong44.model.Gallery">
-            select * from myblog.gallery where Date(uploadDate) BETWEEN #{oldDate} and  #{newDate} And user_id=#{id}
-         </select>
-        <select id="findImgById" resultType="com.tiankong44.model.Gallery">
-            select imgName from myblog.gallery where id=#{id}
-         </select>-->
+    <select id="getTagsByUserId" resultType="com.tiankong44.model.vo.TagVo">
+        select t.id value,t.name label
+        from myblog.tag t ,myblog.user_tag ut
+        where ut.userId=#{userId} and ut.tagId=t.id
+    </select>
+
+    <insert id="saveTagAndUser">
+        insert into user_tag (userId,tagId) values(#{userId},#{tagId})
+    </insert>
+
+    <select id="queryTagList" resultType="com.tiankong44.model.vo.TagVo">
+        select t.id value,t.name label
+        from myblog.tag t ,myblog.user_tag ut
+        where ut.userId=#{userId} and ut.tagId=t.id
+        <if test="tagName!=null and tagName!=''">
+            and t.name LIKE CONCAT ('%',#{tagName},'%')
+        </if>
+    </select>
+
+    <select id="getTagByUserIdAndTagId" resultType="com.tiankong44.model.vo.UserTag">
+        SELECT userId,tagId from user_tag where userId=#{userId} and tagId=#{tagId}
+    </select>
+    <delete id="deleteBlogAndTags">
+        delete from blog_tag where blog_id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteTagAndUser">
+        delete from user_tag where userId=#{userId} and tagId=#{tagId}
+    </delete>
+
 </mapper>

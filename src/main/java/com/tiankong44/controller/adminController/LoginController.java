@@ -1,17 +1,20 @@
 package com.tiankong44.controller.adminController;
 
+import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.model.User;
 import com.tiankong44.service.impl.UserServiceImpl;
+import com.tiankong44.util.ConstantUtil;
+import com.tiankong44.util.JsonUtils;
 import com.tiankong44.util.MD5Utils;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
  * @ClassName LoginController
@@ -33,32 +36,51 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(@Param("username") String username, @Param("password") String password, HttpSession session, RedirectAttributes RedirectAttributes) {
+    @ResponseBody
+    public BaseRes login(@RequestBody String msg, HttpSession session, RedirectAttributes RedirectAttributes) {
+        BaseRes res = new BaseRes();
 
+        JSONObject reqJson = null;
+        try {
+            reqJson = JSONObject.fromObject(msg);
+            Map<?, ?> checkMap = JsonUtils.noNulls(reqJson, "username", "password");
+            if (checkMap != null) {
+                res.setCode(1);
+                res.setDesc("请求参数错误");
+                return res;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            res.setCode(1);
+            res.setDesc("请求参数异常");
+            return res;
+        }
 
+        String username = reqJson.getString("username");
+        String password = reqJson.getString("password");
         User user = userService.findUser(username, MD5Utils.code(password));
         if (user != null) {
             user.setPassword("");
-            session.setAttribute("user",user);
-            session.setAttribute("user_id", user.getId());
-            session.setAttribute("username", user.getUsername());
-            session.setAttribute("avatar", user.getAvatar());
-            session.removeAttribute("failedmessage");
-            return "redirect:/admin/blogs";
+            session.setAttribute(user.SESSION_KEY, user);
+            res.setCode(ConstantUtil.RESULT_SUCCESS);
+            res.setData(user);
+            res.setDesc("登陆成功");
         } else {
-            session.setAttribute("failedmessage", "用户名或者密码错误！");
-
-            return "redirect:/admin ";
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("登陆失败！用户名或者密码错误！");
         }
+        return res;
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.removeAttribute("username");
-        session.removeAttribute("avatar");
-        session.removeAttribute("failedmessage");
-
-        return "redirect:/admin ";
+    @PostMapping("/logout")
+    @ResponseBody
+    public BaseRes logout(HttpServletRequest request, HttpSession session) {
+        BaseRes res=new BaseRes();
+        User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        session.removeAttribute(user.SESSION_KEY);
+        res.setCode(ConstantUtil.RESULT_SUCCESS);
+        res.setDesc("登出成功！");
+        return res;
 
     }
 

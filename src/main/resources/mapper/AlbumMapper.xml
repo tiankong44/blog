@@ -16,10 +16,10 @@
         select * from myblog.album Order by   uploadDate DESC
      </select>
     <select id="findImgByGroupDate" resultType="com.tiankong44.model.Album">
-        select * from myblog.album where DATE_FORMAT(uploadDate,'%Y-%m-%d')=#{day} Order by   uploadDate DESC
+        select id ,imgName,path,user_id,DATE_FORMAT(uploadDate,'%Y-%m-%d %H:%i:%s') uploadDate from myblog.album where DATE_FORMAT(uploadDate,'%Y-%m-%d')=#{day} Order by   uploadDate DESC
      </select>
     <select id="getAllDate" resultType="com.tiankong44.model.Album">
-      select uploadDate from myblog.album GROUP BY DATE_FORMAT(uploadDate,'%m-%d-%Y') Order by   uploadDate DESC
+      select DATE_FORMAT(uploadDate,'%Y-%m-%d') uploadDate from myblog.album GROUP BY DATE_FORMAT(uploadDate,'%Y-%m-%d') Order by   uploadDate DESC
      </select>
     <delete id="deleteImg">
         delete from myblog.album where id = #{id}
