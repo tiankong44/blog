@@ -104,7 +104,6 @@ public class BlogServiceImpl implements BlogService {
         if (checkMap != null) {
             res.setCode(1);
             res.setDesc("请求参数错误");
-            return res;
         } else {
             Long id = reqJson.getLong("id");
             String ip = request.getRemoteAddr();
@@ -154,8 +153,8 @@ public class BlogServiceImpl implements BlogService {
 
             res.setCode(0);
             res.setData(blog);
-            return res;
         }
+        return res;
     }
 
     public BaseRes getrecommend(HttpServletRequest request) {
@@ -367,10 +366,11 @@ public class BlogServiceImpl implements BlogService {
                 res.setDesc("请求参数错误");
                 return res;
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请求参数错误");
+            return res;
         }
         String tagIds = reqJson.getString("tagIds");
         String[] tags = tagIds.split(",");
@@ -443,6 +443,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
+    @Transactional(timeout = 1000, rollbackFor = Exception.class)
     public BaseRes updateBlog(String msg, HttpServletRequest request) {
         BaseRes res = new BaseRes();
         User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
@@ -462,6 +463,9 @@ public class BlogServiceImpl implements BlogService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请求参数错误");
+            return res;
         }
         String tagIds = reqJson.getString("tagIds");
         String[] tags = tagIds.split(",");
@@ -535,7 +539,7 @@ public class BlogServiceImpl implements BlogService {
         }
         return res;
     }
-
+    @Transactional(timeout = 1000, rollbackFor = Exception.class)
     public BaseRes deleteBlog(String msg) {
         BaseRes res = new BaseRes();
         JSONObject reqJson = null;
@@ -549,6 +553,9 @@ public class BlogServiceImpl implements BlogService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请求参数错误");
+            return res;
         }
         String blogId = reqJson.getString("blogId");
         boolean flag = false;
@@ -751,7 +758,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     @Override
-    @Transactional
+    @Transactional(timeout = 1000, rollbackFor = Exception.class)
     public BaseRes updateBlogPraise(HttpServletRequest request, String msg) {
         BaseRes res = new BaseRes();
         JSONObject reqJson = null;
