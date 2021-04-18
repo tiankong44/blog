@@ -185,11 +185,11 @@ public class TagServiceImpl implements TagService {
         }
         return res;
     }
-
+    @Transactional(timeout = 1000, rollbackFor = Exception.class)
     public void deleteBlogAndTag(Long blogId) {
         this.tagMapper.deleteBlogAndTag(blogId);
     }
-
+    @Transactional(timeout = 1000, rollbackFor = Exception.class)
     public BaseRes updateTag(String msg, User user) {
         BaseRes res = new BaseRes();
         JSONObject reqJson = null;

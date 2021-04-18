@@ -1,6 +1,7 @@
 package com.tiankong44.controller.adminController;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.tiankong44.base.entity.BaseRes;
 import com.tiankong44.model.Gallery;
 import com.tiankong44.model.User;
@@ -22,8 +23,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/admin")
 public class GalleryUpLoadController {
-    @Autowired
-    private Gallery Gallery;
+
     @Autowired
     private GalleryServiceImpl galleryServiceImpl;
 
@@ -32,18 +32,28 @@ public class GalleryUpLoadController {
     public BaseRes upload(@RequestParam("files") MultipartFile[] file,
                           HttpServletRequest request) throws Exception {
         BaseRes res = new BaseRes();
-        String path = "";
         User user = (User) request.getSession().getAttribute(User.SESSION_KEY);
+        if (user == null) {
+            res.setCode(ConstantUtil.RESULT_FAILED);
+            res.setDesc("请先登录！");
+            return res;
+        }
+
+        String path = "";
+
         Long userId = user.getId();
         for (MultipartFile mf : file) {
+            String name = mf.getOriginalFilename();
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
             path = QiniuUpload.updateFile(mf, uuid);
-            Gallery.setImgName(uuid);
-            Gallery.setPath(path);
-            Date date = new Date();
-            Gallery.setUploadDate(date);
-            Gallery.setUserId(userId);
-            boolean flag = galleryServiceImpl.saveImg(Gallery);
+            Gallery gallery = new Gallery();
+            gallery.setImgName(name);
+            gallery.setUuid(uuid);
+            gallery.setPath(path);
+            gallery.setUploadDate(DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+            gallery.setUserId(userId);
+            gallery.setType(ConstantUtil.GALLERY_PICTURE);
+            boolean flag = galleryServiceImpl.saveImg(gallery);
             if (!flag) {
                 res.setCode(ConstantUtil.RESULT_FAILED);
                 res.setDesc("图片上传失败！");

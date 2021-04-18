@@ -121,7 +121,7 @@
         b.user_id userId,u.nickname nickName,u.email email,u.avatar avatar
         from myblog.blog b, myblog.user u where b.id=#{id} AND b.user_id=u.id
     </select>
-
+    
 
     <select id="getBlogById" resultType="com.tiankong44.model.Blog">
         select * from myblog.blog where id=#{id}

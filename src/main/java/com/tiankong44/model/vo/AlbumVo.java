@@ -1,4 +1,4 @@
-package com.tiankong44.model;
+package com.tiankong44.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 相册
- */
-@Data
+ * @Author zhanghao_SMEICS
+ * @Date 2021/4/11  16:30
+ **/
 @NoArgsConstructor
 @AllArgsConstructor
-public class Album {
+@Data
+public class AlbumVo {
     private Long id;
     //相册名
     private String albumName;
@@ -26,5 +27,5 @@ public class Album {
     private String createTime;
 
     private String mainPicture; //主图
-    private List<Gallery> photos;
+    private List<PhotoVo> photos;
 }

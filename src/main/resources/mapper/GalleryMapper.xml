@@ -5,23 +5,73 @@
 <mapper namespace="com.tiankong44.dao.GalleryMapper">
 
     <insert id="saveImg" parameterType="com.tiankong44.model.Gallery">
-      insert into gallery(imgName,path,uploadDate,user_id) values(#{imgName},#{path},#{uploadDate},#{userId});
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into gallery(uuid,imgName,path,uploadDate,userId,type,albumId) values(#{uuid},#{imgName},#{path},#{uploadDate},#{userId},#{type},#{albumId});
     </insert>
 
+
+
     <select id="listImg" resultType="com.tiankong44.model.Gallery">
-        select * from myblog.gallery where user_id=#{id} Order by   uploadDate DESC
-     </select>
+        select * from myblog.gallery where user_id=#{id} Order by uploadDate DESC
+    </select>
 
 
     <delete id="deleteImg">
         delete from myblog.gallery where id = #{id}
     </delete>
+
     <select id="findImgByDate" resultType="com.tiankong44.model.Gallery">
-        select * from myblog.gallery where Date(uploadDate) BETWEEN #{oldDate} and  #{newDate} And user_id=#{id}
-     </select>
+        select * from myblog.gallery where Date(uploadDate) BETWEEN #{oldDate} and #{newDate} And user_id=#{id}
+    </select>
     <select id="findImgById" resultType="com.tiankong44.model.Gallery">
-        select imgName from myblog.gallery where id=#{id}
-     </select>
+        select id,imgName,path,uploadDate,userId,type,albumId from gallery where id=#{id}
+    </select>
+    <update id="updateAlbumId" parameterType="com.tiankong44.model.Gallery">
+        update gallery set albumId=#{albumId} where id=#{id}
+    </update>
 
 
+    <insert id="backupAlbumPhotos">
+        insert into gallery_log(oldGalleryId,uuid,imgName,path,uploadDate,userId,type,albumId,createTime)
+        select id,uuid,imgName,path,uploadDate,userId,type,albumId,now() from gallery where albumId=#{albumId} and userId =#{userId}
+    </insert>
+    <insert id="backupAlbumPhotosChecked">
+        insert into gallery_log(oldGalleryId,uuid,imgName,path,uploadDate,userId,type,albumId,createTime)
+        select id,uuid,imgName,path,uploadDate,userId,type,albumId,now() from gallery where albumId=#{albumId} and userId =#{userId}
+        AND id in
+        <foreach collection="photoList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+
+    </insert>
+
+
+    <delete id="deleteAlbumPhotos">
+        delete from gallery where albumId=#{albumId} and userId =#{userId}
+    </delete>
+    <delete id="deleteAlbumPhotosChecked">
+        delete from gallery where albumId=#{albumId} and userId =#{userId}
+        AND id in
+        <foreach collection="photoList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="savePictures">
+        insert into gallery(uuid,imgName,path,uploadDate,userId,type,albumId)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.uuid},
+            #{item.imgName},
+            #{item.path},
+            #{item.uploadDate},
+            #{item.userId},
+            #{item.type},
+            #{item.albumId}
+            )
+        </foreach>
+    </insert>
 </mapper>

@@ -1,26 +1,28 @@
 package com.tiankong44.service;
 
 import com.tiankong44.base.entity.BaseRes;
-import com.tiankong44.model.Album;
+import com.tiankong44.model.Gallery;
+import com.tiankong44.model.User;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
 public interface AlbumService {
-    void saveImg(Album album);
 
-    void deleteImg(Long id);
 
-    List<Album> listImg(Long id);
+    BaseRes queryAlbumList(String msg, User user);
 
-    void updateImg(Long id);
+    BaseRes saveMainPicture(Gallery mainPicture, User user);
 
-    Album findImgById(Long id);
+    BaseRes addAlbum(String msg, User user);
 
-    BaseRes listAlbum(String msg);
+    BaseRes deleteAlbum(String msg, User user);
 
-    List<Album> findImgByDate(Date oldDate, Date newDate, Long id);
+    BaseRes albumDetail(String msg, User user);
+    BaseRes queryAlbumDetail(String msg, User user);
 
+    BaseRes justAlbumDetail(String msg, User user);
+
+    BaseRes savePictures(List<Gallery> galleryList);
 }

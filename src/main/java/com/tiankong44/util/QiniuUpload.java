@@ -12,6 +12,7 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import com.tiankong44.model.VariableName;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -23,6 +24,7 @@ import java.io.UnsupportedEncodingException;
  *
  * @author 12481
  */
+@Slf4j
 public class QiniuUpload {
     // 设置好账号的ACCESS_KEY和SECRET_KEY
     private static String ACCESS_KEY = VariableName.accessKey; // 这两个登录七牛 账号里面可以找到
@@ -87,7 +89,8 @@ public class QiniuUpload {
                 //解析上传成功的结果
                 DefaultPutRet putRet;
                 putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-                return VariableName.domain +"/" + putRet.key;
+                log.info(putRet.toString());
+                return VariableName.domain + "/" + putRet.key;
 
             } catch (QiniuException ex) {
                 Response r = ex.response;

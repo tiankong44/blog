@@ -3,31 +3,109 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tiankong44.dao.AlbumMapper">
+    <resultMap id="Album" type="com.tiankong44.model.Album">
+        <id column="id" property="id"/>
+        <result column="albumName" property="albumName"/>
+        <result column="type" property="type"/>
+        <result column="mainPicture" property="mainPicture"/>
+        <result column="remark" property="remark"/>
+        <result column="createTime" property="createTime"/>
+        <result column="userId" property="userId"/>
+        <collection property="photos" ofType="com.tiankong44.model.Gallery">
+            <id column="gId" property="id"/>
+            <result column="imgName" property="imgName"/>
+            <result column="path" property="path"/>
+            <result column="uploadDate" property="uploadDate"/>
+            <result column="gUserId" property="userId"/>
+            <result column="gType" property="type"/>
+        </collection>
+    </resultMap>
+    <resultMap id="PhotoVo" type="com.tiankong44.model.vo.AlbumVo">
+        <id column="id" property="id"/>
+        <result column="albumName" property="albumName"/>
+        <result column="type" property="type"/>
+        <result column="mainPicture" property="mainPicture"/>
+        <result column="remark" property="remark"/>
+        <result column="createTime" property="createTime"/>
+        <result column="userId" property="userId"/>
+        <collection property="photos" ofType="com.tiankong44.model.vo.PhotoVo">
+            <id column="gId" property="id"/>
+            <result column="imgName" property="imgName"/>
+            <result column="path" property="path"/>
+            <result column="uploadDate" property="uploadDate"/>
+            <result column="gUserId" property="userId"/>
+            <result column="gType" property="type"/>
+        </collection>
+    </resultMap>
 
-    <insert id="saveImg" parameterType="com.tiankong44.model.Album">
-      insert into album(imgName,path,uploadDate,user_id) values(#{imgName},#{path},#{uploadDate},#{userId});
+
+    <select id="queryAlbumList" resultMap="Album">
+        SELECT a.id,a.albumName,a.type, DATE_FORMAT(a.createTime,'%Y-%m-%d %H:%i:%s') createTime,a.userId, a.mainPicture,a.remark
+        FROM album a
+        WHERE a.userId=#{userId}
+        <if test="albumName != null and albumName!=''">
+            AND a.albumName like concat('%',#{albumName},'%')
+        </if>
+        <if test="startTime!=null and startTime!=''">
+            and a.createTime &gt;= #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and a.createTime &lt;= #{endTime}
+        </if>
+    </select>
+
+    <insert id="addAlbum">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into album (albumName,type,mainPicture,remark,userId,createTime)
+        values(#{albumName},#{type},#{mainPicture},#{remark},#{userId},#{createTime})
     </insert>
 
-    <select id="listImg" resultType="com.tiankong44.model.Album">
-        select * from myblog.album where user_id=#{id} Order by   uploadDate DESC
-     </select>
+    <!--    <select id="queryAlbumAndPhotosList" resultMap="Album">-->
+    <!--        SELECT a.id,a.albumName,a.type, DATE_FORMAT(a.createTime,'%Y-%m-%d %H:%i:%s') createTime,a.userId, a.mainPicture,-->
+    <!--        g.id gId,g.imgName,g.path, DATE_FORMAT(g.uploadDate,'%Y-%m-%d %H:%i:%s') uploadDate,g.userId gUserId,g.type gType-->
+    <!--        from album a,gallery g-->
+    <!--        where g.type=1 and a.id=g.albumId-->
+    <!--        <if test="albumName != null and albumName!=''">-->
+    <!--            AND a.albumName like concat('%',#{albumName},'%')-->
+    <!--        </if>-->
 
-    <select id="listAlbum" resultType="com.tiankong44.model.Album">
-        select * from myblog.album Order by   uploadDate DESC
-     </select>
-    <select id="findImgByGroupDate" resultType="com.tiankong44.model.Album">
-        select id ,imgName,path,user_id,DATE_FORMAT(uploadDate,'%Y-%m-%d %H:%i:%s') uploadDate from myblog.album where DATE_FORMAT(uploadDate,'%Y-%m-%d')=#{day} Order by   uploadDate DESC
-     </select>
-    <select id="getAllDate" resultType="com.tiankong44.model.Album">
-      select DATE_FORMAT(uploadDate,'%Y-%m-%d') uploadDate from myblog.album GROUP BY DATE_FORMAT(uploadDate,'%Y-%m-%d') Order by   uploadDate DESC
-     </select>
-    <delete id="deleteImg">
-        delete from myblog.album where id = #{id}
+    <!--    </select>-->
+
+
+    <insert id="backupAlbum">
+        insert into album_log(oldAlbumId,albumName,type,mainPicture,remark,userId,createTime,logTime)
+        select id,albumName,type,mainPicture,remark,userId,createTime,now() from album where id=#{albumId} and userId=#{userId}
+    </insert>
+
+    <delete id="deleteAlbum">
+        delete from album where id =#{albumId} and userId=#{userId}
     </delete>
-    <select id="findImgByDate" resultType="com.tiankong44.model.Album">
-        select * from myblog.album where Date(uploadDate) BETWEEN #{oldDate} and  #{newDate} And user_id=#{id} Order by   uploadDate DESC
-     </select>
-    <select id="findImgById" resultType="com.tiankong44.model.Album">
-        select imgName from myblog.album where id=#{id} Order by   uploadDate DESC
-     </select>
+
+    <select id="getAlbumDetail" resultMap="PhotoVo">
+        SELECT a.id,a.albumName,a.type, DATE_FORMAT(a.createTime,'%Y-%m-%d') createTime,a.userId, a.mainPicture,a.remark,
+        g.id gId,g.imgName,g.path, DATE_FORMAT(g.uploadDate,'%Y-%m-%d') uploadDate,g.userId gUserId,g.type gType
+        from album a
+        LEFT JOIN gallery g on a.id=g.albumId
+        where a.id =#{albumId} and a.userId=#{userId} ORDER BY g.uploadDate desc
+    </select>
+    <select id="queryAlbumDetail" resultMap="PhotoVo">
+        SELECT a.id,a.albumName,a.type, DATE_FORMAT(a.createTime,'%Y-%m-%d') createTime,a.userId, a.mainPicture,a.remark,
+        g.id gId,g.imgName,g.path, DATE_FORMAT(g.uploadDate,'%Y-%m-%d') uploadDate,g.userId gUserId,g.type gType
+        from album a
+        LEFT JOIN gallery g on a.id=g.albumId
+        <if test="startTime!=null and startTime!=''">
+            and g.uploadDate &gt;= #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and g.uploadDate &lt;= #{endTime}
+        </if>
+        where a.id =#{albumId} and a.userId=#{userId} ORDER BY g.uploadDate desc
+    </select>
+    <select id="getJustAlbumDetail" resultType="com.tiankong44.model.vo.AlbumVo">
+        select id,albumName,type,mainPicture,remark,createTime,userId
+        from album
+        where userId=#{userId} and id=#{albumId}
+    </select>
 </mapper>
